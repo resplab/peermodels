@@ -10,7 +10,7 @@ model_input<-NULL
 #' @export
 connect_to_model<-function(model_name)
 {
-  current_model<<-model_name
+  current_model <- model_name
   call <- paste("http://", address, "/ocpu/library/",current_model,"/info",sep="")
   x<-POST(call)
   if(x$status_code!=200)
@@ -68,7 +68,7 @@ get_model_input<-function()
 #' @export
 model_run<-function(parms="")
 {
-  return(PRISM_call("model_run",parms1=model_setting,parms2=model_input))
+  return(PRISM_call("model_run", parms1=model_setting, parms2=model_input))
 }
 
 
