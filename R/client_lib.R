@@ -8,7 +8,7 @@ model_input<-NULL
 
 
 #' @export
-connect_to_model<-function(model_name)
+connect_to_model<-function(model_name, address = "localhost:5656")
 {
   current_model <- model_name
   call <- paste("http://", address, "/ocpu/library/",current_model,"/info",sep="")
