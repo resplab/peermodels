@@ -1,21 +1,25 @@
-address <- "localhost:5656"
+#address <- "localhost:5656"
 #address <- "142.103.58.49"
+thisSession <- new.env()
+
 options(stringsAsFactors = FALSE)
 
 current_model<-""
-model_setting<-NULL
-model_input<-NULL
+thisSession$model_setting<-NULL
+thisSession$model_input<-NULL
 
 
 #' @export
 connect_to_model<-function(model_name, address = "localhost:5656")
 {
+  thisSession$url <- address
   current_model <- model_name
-  call <- paste("http://", address, "/ocpu/library/",current_model,"/info",sep="")
+  call <- paste("http://", thisSession$url, "/ocpu/library/", current_model,"/info", sep="")
   x<-POST(call)
   if(x$status_code!=200)
   {
-    message("Error connecting to model"); return(-1);
+    message("Error connecting to model");
+    return(-1);
   }
   return(0)
 }
@@ -24,28 +28,28 @@ connect_to_model<-function(model_name, address = "localhost:5656")
 #' @export
 get_default_input<-function()
 {
-  PRISM_call("get_default_input",parms="")
+  PRISM_call("get_default_input", parms="")
 }
 
 
 #' @export
 get_default_setting<-function()
 {
-  PRISM_call("get_default_setting",parms="")
+  PRISM_call("get_default_setting", parms="")
 }
 
 
 #' @export
 set_model_setting<-function(setting)
 {
-  model_setting<<-setting
+  thisSession$model_setting <- setting
 }
 
 
 #' @export
 set_model_input<-function(input)
 {
-  model_input<<-input
+  thisSession$model_input <- input
 }
 
 
@@ -53,14 +57,14 @@ set_model_input<-function(input)
 #' @export
 get_model_setting<-function()
 {
-  return(model_setting)
+  return(thisSession$model_setting)
 }
 
 
 #' @export
 get_model_input<-function()
 {
-  return(model_input)
+  return(thisSession$model_input)
 }
 
 
@@ -68,7 +72,7 @@ get_model_input<-function()
 #' @export
 model_run<-function(parms="")
 {
-  return(PRISM_call("model_run", parms1=model_setting, parms2=model_input))
+  return(PRISM_call("model_run", parms1=thisSession$model_setting, parms2=thisSession$model_input))
 }
 
 
@@ -76,10 +80,10 @@ model_run<-function(parms="")
 PRISM_call<-function(func,...)
 {
 
-  call <- paste("http://", address, "/ocpu/library/prismServer/R/gateway_json",...length(),sep="")
+  call <- paste("http://", thisSession$url, "/ocpu/library/prismServer/R/gateway_json",...length(),sep="")
   message(paste("call is ",call))
 
-  arg<-list(func=func,parms=...)
+  arg<-list(func=func, parms=...)
 
   x<-POST(call,body=toJSON(arg), content_type_json())
 
@@ -89,7 +93,7 @@ PRISM_call<-function(func,...)
 
   token<-x$headers$'x-ocpu-session'
 
-  url<-paste("http://", address, "/ocpu/tmp/",token,"/R/.val",sep="")
+  url<-paste("http://", thisSession$url, "/ocpu/tmp/",token,"/R/.val",sep="")
   message(url)
   get <- url
 
