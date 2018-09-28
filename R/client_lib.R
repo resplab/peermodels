@@ -35,6 +35,7 @@ connect_to_model<-function(model_name, address = "localhost:5656")
 #' @export
 get_default_input<-function()
 {
+  message("Current model is ", thisSession$current_model)
   PRISM_call("get_default_input", parms="")
 }
 
@@ -45,6 +46,7 @@ get_default_input<-function()
 #' @export
 get_default_setting<-function()
 {
+  message("Current model is ", thisSession$current_model)
   PRISM_call("get_default_setting", parms="")
 }
 
@@ -55,6 +57,7 @@ get_default_setting<-function()
 #' @export
 set_model_setting<-function(setting)
 {
+  message("Current model is ", thisSession$current_model)
   thisSession$model_setting <- setting
 }
 
@@ -65,6 +68,7 @@ set_model_setting<-function(setting)
 #' @export
 set_model_input<-function(input)
 {
+  message("Current model is ", thisSession$current_model)
   thisSession$model_input <- input
 }
 
@@ -75,6 +79,7 @@ set_model_input<-function(input)
 #' @export
 get_model_setting<-function()
 {
+  message("Current model is ", thisSession$current_model)
   return(thisSession$model_setting)
 }
 
@@ -85,6 +90,7 @@ get_model_setting<-function()
 #' @export
 get_model_input<-function()
 {
+  message("Current model is ", thisSession$current_model)
   return(thisSession$model_input)
 }
 
@@ -97,6 +103,7 @@ get_model_input<-function()
 #' @export
 model_run<-function(parms="")
 {
+  message("Current model is ", thisSession$current_model)
   return(PRISM_call("model_run", parms1=thisSession$model_setting, parms2=thisSession$model_input))
 }
 
