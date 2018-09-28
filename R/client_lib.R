@@ -4,17 +4,21 @@ thisSession <- new.env()
 
 options(stringsAsFactors = FALSE)
 
-current_model<-""
+thisSession$current_model<-""
 thisSession$model_setting<-NULL
 thisSession$model_input<-NULL
 
-
+#' Checks to see if model is available in PRISM
+#'
+#' @param model_name tment benefit at that marker value
+#' @param address Server address. Default is "localhost:5656". Could be an IP address, for example: 122.103.54.12.
+#' @return 0 for sucess and 1 for error
 #' @export
 connect_to_model<-function(model_name, address = "localhost:5656")
 {
   thisSession$url <- address
-  current_model <- model_name
-  call <- paste("http://", thisSession$url, "/ocpu/library/", current_model,"/info", sep="")
+  thisSession$current_model <- model_name
+  call <- paste("http://", thisSession$url, "/ocpu/library/", thisSession$current_model,"/info", sep="")
   x<-POST(call)
   if(x$status_code!=200)
   {
@@ -25,6 +29,9 @@ connect_to_model<-function(model_name, address = "localhost:5656")
 }
 
 
+#' Returns default PRISM model input
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 get_default_input<-function()
 {
@@ -32,6 +39,9 @@ get_default_input<-function()
 }
 
 
+#' Returns default PRISM model settings
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 get_default_setting<-function()
 {
@@ -39,6 +49,9 @@ get_default_setting<-function()
 }
 
 
+#' Sets PRISM model settings
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 set_model_setting<-function(setting)
 {
@@ -46,6 +59,9 @@ set_model_setting<-function(setting)
 }
 
 
+#' Sets PRISM model inputs
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 set_model_input<-function(input)
 {
@@ -53,7 +69,9 @@ set_model_input<-function(input)
 }
 
 
-
+#' Returns PRISM model settings
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 get_model_setting<-function()
 {
@@ -61,6 +79,9 @@ get_model_setting<-function()
 }
 
 
+#' Returns PRISM model input
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 get_model_input<-function()
 {
@@ -69,6 +90,10 @@ get_model_input<-function()
 
 
 
+#' Executes PRISM model
+#'
+#' @param parms required custom parameters for current model
+#' @return 0 for sucess and 1 for error
 #' @export
 model_run<-function(parms="")
 {
@@ -76,7 +101,7 @@ model_run<-function(parms="")
 }
 
 
-#' @export
+
 PRISM_call<-function(func,...)
 {
 
@@ -108,7 +133,6 @@ PRISM_call<-function(func,...)
 
 
 
-#' @export
 process_json<-function(y)
 {
   return(fromJSON(content(y),simplifyMatrix=FALSE))
