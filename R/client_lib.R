@@ -1,85 +1,121 @@
-address <- "localhost:5656"
+#address <- "localhost:5656"
 #address <- "142.103.58.49"
+thisSession <- new.env()
+
 options(stringsAsFactors = FALSE)
 
-current_model<-""
-model_setting<-NULL
-model_input<-NULL
+thisSession$current_model<-""
+thisSession$model_setting<-NULL
+thisSession$model_input<-NULL
 
-
+#' Checks to see if model is available in PRISM
+#'
+#' @param model_name tment benefit at that marker value
+#' @param address Server address. Default is "localhost:5656". Could be an IP address, for example: 122.103.54.12.
+#' @return 0 for sucess and 1 for error
 #' @export
-connect_to_model<-function(model_name)
+connect_to_model<-function(model_name, address = "localhost:5656")
 {
-  current_model <- model_name
-  call <- paste("http://", address, "/ocpu/library/",current_model,"/info",sep="")
+  thisSession$url <- address
+  thisSession$current_model <- model_name
+  call <- paste("http://", thisSession$url, "/ocpu/library/", thisSession$current_model,"/info", sep="")
   x<-POST(call)
   if(x$status_code!=200)
   {
-    message("Error connecting to model"); return(-1);
+    message("Error connecting to model");
+    return(-1);
   }
   return(0)
 }
 
 
+#' Returns default PRISM model input
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 get_default_input<-function()
 {
-  PRISM_call("get_default_input",parms="")
+  message("Current model is ", thisSession$current_model)
+  PRISM_call("get_default_input", parms="")
 }
 
 
+#' Returns default PRISM model settings
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 get_default_setting<-function()
 {
-  PRISM_call("get_default_setting",parms="")
+  message("Current model is ", thisSession$current_model)
+  PRISM_call("get_default_setting", parms="")
 }
 
 
+#' Sets PRISM model settings
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 set_model_setting<-function(setting)
 {
-  model_setting<<-setting
+  message("Current model is ", thisSession$current_model)
+  thisSession$model_setting <- setting
 }
 
 
+#' Sets PRISM model inputs
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 set_model_input<-function(input)
 {
-  model_input<<-input
+  message("Current model is ", thisSession$current_model)
+  thisSession$model_input <- input
 }
 
 
-
+#' Returns PRISM model settings
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 get_model_setting<-function()
 {
-  return(model_setting)
+  message("Current model is ", thisSession$current_model)
+  return(thisSession$model_setting)
 }
 
 
+#' Returns PRISM model input
+#'
+#' @return 0 for sucess and 1 for error
 #' @export
 get_model_input<-function()
 {
-  return(model_input)
+  message("Current model is ", thisSession$current_model)
+  return(thisSession$model_input)
 }
 
 
 
+#' Executes PRISM model
+#'
+#' @param parms required custom parameters for current model
+#' @return 0 for sucess and 1 for error
 #' @export
 model_run<-function(parms="")
 {
-  return(PRISM_call("model_run", parms1=model_setting, parms2=model_input))
+  message("Current model is ", thisSession$current_model)
+  return(PRISM_call("model_run", parms1=thisSession$model_setting, parms2=thisSession$model_input))
 }
 
 
-#' @export
+
 PRISM_call<-function(func,...)
 {
 
-  call <- paste("http://", address, "/ocpu/library/prismServer/R/gateway_json",...length(),sep="")
+  call <- paste("http://", thisSession$url, "/ocpu/library/prismServer/R/gateway_json",...length(),sep="")
   message(paste("call is ",call))
 
-  arg<-list(func=func,parms=...)
+  arg<-list(func=func, parms=...)
 
   x<-POST(call,body=toJSON(arg), content_type_json())
 
@@ -89,7 +125,7 @@ PRISM_call<-function(func,...)
 
   token<-x$headers$'x-ocpu-session'
 
-  url<-paste("http://", address, "/ocpu/tmp/",token,"/R/.val",sep="")
+  url<-paste("http://", thisSession$url, "/ocpu/tmp/",token,"/R/.val",sep="")
   message(url)
   get <- url
 
@@ -104,7 +140,6 @@ PRISM_call<-function(func,...)
 
 
 
-#' @export
 process_json<-function(y)
 {
   return(fromJSON(content(y),simplifyMatrix=FALSE))
