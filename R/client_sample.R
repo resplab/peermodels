@@ -7,3 +7,4 @@ connect_to_model("testModel")
 model_run()
 
 draw_plots(1)
+

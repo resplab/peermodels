@@ -1,5 +1,3 @@
-options(stringsAsFactors = FALSE)
-
 current_model<-""
 model_setting<-NULL
 model_input<-NULL
@@ -7,8 +5,6 @@ model_output_ex<-NULL
 address <- "localhost:5656"
 last_token<-""
 
-#address <- "localhost:5656"
-#address <- "142.103.58.49"
 thisSession <- new.env()
 
 options(stringsAsFactors = FALSE)
@@ -34,8 +30,8 @@ connect_to_model<-function(model_name, address = "localhost:5656")
     message("Error connecting to model");
     return(-1);
   }
-  model_setting<<-get_default_setting()
-  model_input<<-get_default_input()
+  thisSession$model_setting<<-get_default_setting()
+  thisSession$model_input<<-get_default_input()
   return(0)
 }
 
@@ -127,9 +123,30 @@ get_model_input<-function()
 }
 
 
+
+
+#' Returns default PRISM model output
+#'
+#' @return 0 for sucess and 1 for error
+#' @export
+get_default_output<-function()
+{
+  message("Current model is ", thisSession$current_model)
+  x<-PRISM_call("get_default_output")
+  for(i in 1:length(x))
+  {
+    if(canbe.prism_output(x[[i]])) x[[i]]<-as.prism_output(x[[i]])
+  }
+  return(x)
+}
+
+
+
+
+
 draw_plots<-function(plot_number=NULL)
 {
-  plots<-PRISM_filter_object_list(model_output_ex,"graphics")
+  plots<-PRISM_filter_object_list(thisSession$model_output_ex,"graphics")
   if(!is.null(plot_number)) plots<-plots[plot_number]
   for(obj in plots)
   {
@@ -149,11 +166,12 @@ draw_plots<-function(plot_number=NULL)
 #' @export
 model_run<-function(parms="")
 {
-  res<-PRISM_call("model_run", parms1=model_setting, parms2=model_input)
-  model_output_ex<<-PRISM_get_object_list()
-  return(res)
+  res<-PRISM_call("model_run", parms1=thisSession$model_setting, parms2=thisSession$model_input)
+  thisSession$model_output_ex<<-PRISM_get_object_list()
   message("Current model is ", thisSession$current_model)
-  return(PRISM_call("model_run", parms1=thisSession$model_setting, parms2=thisSession$model_input))
+  thisSession$results<<-res
+  thisSession$session_id<<-last_token
+  return(res)
 }
 
 
@@ -236,6 +254,37 @@ PRISM_get_res_object<-function(token=last_token,object)
 
 
 
+fetch_model_output<-function(po)
+{
+  if(substring(po$source,1,1)=="$")
+  {
+    po$value<-thisSession$results[[substring(po$source,2)]]
+  }
+  if(po$type=="graphic/url")
+  {
+    plots<-PRISM_filter_object_list(thisSession$model_output_ex,"graphics")
+    plots<-plots[as.numeric(po$source)]
+    po$value<-PRISM_get_res_object(token=thisSession$session_id, object=paste("graphics/",po$source,sep=""))
+    par(new=F)
+    plot.new()
+    rasterImage(po$value,0,0,1,1)
+  }
+
+  return(po)
+}
+
+
+
+fetch_model_outputs<-function()
+{
+  pos<-get_default_output()
+  for(i in 1:length(pos))
+    pos[[i]]<-fetch_model_output(pos[[i]])
+  return(pos)
+}
+
+
+
 
 
 
@@ -246,26 +295,100 @@ process_json<-function(y)
 }
 
 
-#Depracated
-process_R<-function(y)
+
+
+
+
+
+
+
+
+###################Prism objects#################
+prism_input <- function(value, type="guess", group="", default=NULL, range=c(NULL,NULL), title="", description="")
 {
-  z<-rawToChar(as.raw(strtoi(y$content, 16L)))
+  me <- list(
+    value=value,
+    type = type,
+    default = default,
+    range=range
+  )
 
-  poss<-c(1,as.vector(gregexpr("\r\n",z)[[1]]))
+  if(is.vector(value)) {if(length(value)==1) me$type<-"scalar" else me$type<-"vector"}
+  if(is.matrix(value)) me$type<-"matrix"
 
-  str<-""
-  n_line<-length(poss)
-  for(i in 1:(n_line-1))
-  {
-    line<-substring(z,poss[i],poss[i+1]-1)
-    pos <- gregexpr('\"', line)
-    line<-substr(line, pos[[1]][1]+1, pos[[1]][length(pos[[1]])]-1)
-    line<-gsub( "\\", "", line, fixed=TRUE)
-    str<-paste(str,line,sep="")
-  }
+  ## Set the name for the class
+  class(me) <- append(class(me),"prism_input")
+  return(me)
+}
 
-  res<-eval(parse(text=str))
-  return(res)
+
+
+
+
+summary <- function(x)
+{
+  UseMethod("summary",x)
+}
+summary.prism_input<-function(x)
+{
+  return(x$value)
+}
+
+
+
+
+print <- function(x)
+{
+  UseMethod("print",x)
+}
+print.prism_input<-function(x)
+{
+  print.listof(x)
+}
+
+
+
+Ops<-function(e1,e2)
+{
+  UseMethod("Ops",x)
+}
+Ops.prism_input<-function(e1,e2)
+{
+  source<-NULL;
+  dest<-NULL;
+  if(sum(class(e1)=="prism_input")>0) {source<-e1; e1<-e1$value}
+  if(sum(class(e2)=="prism_input")>0) {dest<-e2; e2<-e2$value}
+  val<-NextMethod(.Generic)
+  if(is.null(source)) return(val) else {source$value<-val; return(source)}
+}
+
+
+Math<-function(x,...)
+{
+  UseMethod("Math",x,...)
+}
+Math.prism_input<-function(x,...)
+{
+  source<-NULL;
+  dest<-NULL;
+  if(sum(class(x)=="prism_input")>0) {source<-x; x<-x$value}
+  val<-NextMethod(.Generic)
+  if(is.null(source)) return(val) else {source$value<-val; return(source)}
+}
+
+
+
+Summary<-function(...,na.rm)
+{
+  UseMethod("Summary",...,na.rm)
+}
+Summary.prism_input<-function(...,na.rm)
+{
+  args<-list(...)
+  args <- lapply(args, function(x) {
+    if(sum(class(x)=="prism_input")>0) x$value
+  })
+  do.call(.Generic, c(args, na.rm = na.rm))
 }
 
 
@@ -274,8 +397,52 @@ process_R<-function(y)
 
 
 
+#type=c("scalar","vector","matrix","data.frame","graphic/url","graphic/data","file/url","file/data")
+prism_output <- function(title="", type="numeric", source="", group="", value=NULL, description="")
+{
+  me <- list(
+    type = type,
+    source = source,
+    group=group,
+    value=value,
+    title=title,
+    description=description
+  )
+
+  ## Set the name for the class
+  class(me) <- append(class(me),"prism_output")
+  return(me)
+}
 
 
+
+
+
+
+as.prism_output<-function(...)
+{
+  x<-list(...)[[1]]
+  out<-prism_output()
+  for(i in 1:length(x))
+  {
+    if(length(x[[i]])>0) out[names(x)[i]]<-x[[i]]
+  }
+  return(out)
+}
+
+canbe.prism_output<-function(...)
+{
+  y<-prism_output()
+  xn<-sort(names(...))
+  yn<-sort(names(y))
+  if(length(xn)==length(yn) && sum(xn==yn)==length(xn)) return(T) else return(F)
+}
+
+print.prism_output<-function(x)
+{
+  if(length(x$value)>100) x$value=paste("[Data of length",length(x$value),"]")
+  dput(unclass(x))
+}
 
 
 
