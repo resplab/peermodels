@@ -211,6 +211,43 @@ PRISM_call<-function(func,...)
 
 
 
+
+
+PRISM_call_s<-function(session,func,...)
+{
+  call <- paste("http://", address, "/ocpu/library/prismServer/R/gateway_json",...length(),sep="")
+  call <- paste("http://", thisSession$url, "/ocpu/library/prismServer/R/gateway_json",...length(),"_s",sep="")
+  message(paste("call is ",call))
+  arg<-list(session=session, func=func, parms=...)
+
+  x<-POST(call,body=toJSON(arg), content_type_json())
+
+  if(x$status_code!=200 && x$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(x$content, 16L))))
+
+  #message(paste("x statargus is",x$status_code))
+
+  token<-x$headers$'x-ocpu-session'
+  last_token<<-token
+
+  #message(paste("token is:",token))
+
+  url<-paste("http://", address, "/ocpu/tmp/",token,"/R/.val",sep="")
+  #message(url)
+  url<-paste("http://", thisSession$url, "/ocpu/tmp/",token,"/R/.val",sep="")
+  message(url)
+  get <- url
+
+  y<-GET (get)
+
+  if(y$status_code!=200 && y$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(y$content, 16L))))
+
+  res<-process_json(y)
+
+  return(res)
+}
+
+
+
 PRISM_get_object_list<-function(token=last_token)
 {
 
@@ -304,13 +341,16 @@ process_json<-function(y)
 
 
 ###################Prism objects#################
-prism_input <- function(value, type="guess", group="", default=NULL, range=c(NULL,NULL), title="", description="")
+prism_input <- function(value, type="guess", group="", default=NULL, range=c(NULL,NULL), title="", description="", control="")
 {
   me <- list(
     value=value,
     type = type,
     default = default,
-    range=range
+    range=range,
+    title=title,
+    description=description,
+    control=control
   )
 
   if(is.vector(value)) {if(length(value)==1) me$type<-"scalar" else me$type<-"vector"}
@@ -391,6 +431,19 @@ Summary.prism_input<-function(...,na.rm)
   do.call(.Generic, c(args, na.rm = na.rm))
 }
 
+
+
+to_prism_input<-function(x)
+{
+  if(is.list(x))
+  {
+    out<-prism_input(value=x$value)
+    for(nm in names(out))
+    if(!is.null(x[nm])) out[nm]<-x[nm]
+    return(out)
+  }
+  return(prism_input(x))
+}
 
 
 
