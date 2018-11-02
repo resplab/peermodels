@@ -1,6 +1,6 @@
 #Version 2018.11.01
 
-
+#' @export
 prism_input <- function(value, type="guess", group="", default=NULL, range=c(NULL,NULL), title="", description="", control="")
 {
   me <- list(
@@ -25,14 +25,6 @@ prism_input <- function(value, type="guess", group="", default=NULL, range=c(NUL
 
 
 
-summary <- function(x)
-{
-  UseMethod("summary",x)
-}
-summary.prism_input<-function(x)
-{
-  return(x$value)
-}
 
 
 
@@ -41,6 +33,8 @@ print <- function(x)
 {
   UseMethod("print",x)
 }
+
+
 print.prism_input<-function(x)
 {
   print.listof(x)
@@ -82,8 +76,11 @@ Summary<-function(...,na.rm)
 {
   UseMethod("Summary",...,na.rm)
 }
+
+#' @export
 Summary.prism_input<-function(...,na.rm)
 {
+  message("hi")
   args<-list(...)
   args <- lapply(args, function(x) {
     if(sum(class(x)=="prism_input")>0) x$value
@@ -103,7 +100,7 @@ canbe_prism_input<-function(...)
 }
 
 
-
+#' @export
 to_prism_input<-function(x)
 {
   if(is.list(x))
@@ -129,6 +126,7 @@ to_prism_input<-function(x)
 
 
 #type=c("scalar","vector","matrix","data.frame","graphic/url","graphic/data","file/url","file/data")
+#' @export
 prism_output <- function(title="", type="numeric", source="", group="", value=NULL, description="")
 {
   me <- list(
@@ -149,7 +147,7 @@ prism_output <- function(title="", type="numeric", source="", group="", value=NU
 
 
 
-
+#' @export
 as.prism_output<-function(...)
 {
   x<-list(...)[[1]]
@@ -161,6 +159,7 @@ as.prism_output<-function(...)
   return(out)
 }
 
+#' @export
 canbe_prism_output<-function(...)
 {
   y<-prism_output()
@@ -169,6 +168,7 @@ canbe_prism_output<-function(...)
   if(length(xn)==length(yn) && sum(xn==yn)==length(xn)) return(T) else return(F)
 }
 
+#' @export
 print.prism_output<-function(x)
 {
   if(length(x$value)>100) x$value=paste("[Data of length",length(x$value),"]")

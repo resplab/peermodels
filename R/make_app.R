@@ -1,13 +1,14 @@
+#' @export
 make_app<-function(input,output)
 {
   out<-"ui <- fluidPage(
-    titlePanel('salaam'),
+  titlePanel( get_session_info()$current_model),
 
-    # Sidebar layout with input and output definitions ----
-    sidebarLayout(
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
 
-      # Sidebar panel for inputs ----
-      sidebarPanel(
+  # Sidebar panel for inputs ----
+  sidebarPanel(
   "
 
   out<-paste(out,crawl_input(input,"input"),sep="")
@@ -64,11 +65,8 @@ crawl_input<-function(inp,id)
     return(render_prism_control(tmp,id))
   }
 
-    return(out)
+  return(out)
 }
-
-
-
 
 
 render_prism_control<-function(inp,id)
@@ -90,16 +88,16 @@ render_prism_control<-function(inp,id)
         inp$range<-c(inp$value/2,inp$value*2)
       }
       out<-paste(out, "sliderInput(inputId = '",id,"',
-               label = '",ifelse(inp$title=="",id,inp$title),"',
-               min = ",inp$range[1],",
-               max = ",inp$range[2],",
-               value = ", inp$value,")",sep="")
+                 label = '",ifelse(inp$title=="",id,inp$title),"',
+                 min = ",inp$range[1],",
+                 max = ",inp$range[2],",
+                 value = ", inp$value,")",sep="")
     }
     else
     {
       out<-paste(out, "textInput(inputId = '",  id,"',
-               label = '",ifelse(inp$title=="",id,inp$title),"',
-               value = '", inp$value,"')",sep="")
+                 label = '",ifelse(inp$title=="",id,inp$title),"',
+                 value = '", inp$value,"')",sep="")
     }
   }
 }
@@ -107,11 +105,60 @@ render_prism_control<-function(inp,id)
 
 
 
+
+
+
+crawl_output<-function(outp,id)
+{
+  out<-""
+
+  if(inherits(outp,"prism_output")) return(render_prism_output(outp,id))
+
+  if(is.list(outp))
+  {
+    fe<-outp[[1]]
+    if(inherits(fe,"prism_output") || !is.list(fe))
+    {#The items in the current list terminal items, so open a tabpanel and list them here
+      out<-paste(out,"tabPanel(title='",id,"',")
+      first=T
+      for(nm in names(outp))
+      {
+        out<-paste(out,ifelse(first,"",","),crawl_output(outp[[nm]],paste(id,".",nm,sep="")),sep="")
+        first=F
+      }
+      out<-paste(out,"),")
+    }
+    else
+    {
+      out<-paste(out,"tabsetPanel(")
+      first<-T
+      for(nm in names(inp))
+      {
+        out<-paste(out,ifelse(first,"",""),crawl_output(outp[[nm]],paste(id,".",nm,sep="")),sep="")
+        first<-F
+      }
+      out<-paste(out,")",sep="")
+    }
+  }
+  else
+  {
+    #We are dealing with a terminal node here
+    tmp<-to_prism_output(outp)
+    return(render_prism_output(tmp,id))
+  }
+
+  return(out)
+}
+
+
+
+
+
+#' @export
 PRISM_generic_shiny_server<-function(input,output)
 {
   output$results<-renderUI(
     {
-      #browser()
       for(nm in names(input))
       {
         text<-paste("thisSession$model_",gsub('[.]', '$', nm),"<-input$",nm,sep="")

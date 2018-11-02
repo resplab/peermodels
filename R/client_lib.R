@@ -34,25 +34,11 @@ connect_to_model<-function(model_name, address = "localhost:5656")
 }
 
 
-#' @export
-get_output<-function()
-{
-#TODO
-  struct<-PRISM_call("get_default_output")
-  out<-struct
-  for (i in length(struct))
-  {
-    bp<-grep("$",struct[[i]])
-    if(length(bp)>0)
-    {
-      out[[i]]<-fromJSON(PRISM_get_res_object(object = substring(element,1,bp-1)))[[substring(element,bp+1)]]
-    } else
-    {
-      #if(substring())
-      out[[i]]<-fromJSON(PRISM_get_res_object(object = substring(element,1,bp-1)))[[substring(element,bp+1)]]
-    }
-  }
-}
+
+
+
+
+
 
 
 #' Returns default PRISM model input
@@ -174,12 +160,14 @@ draw_plots<-function(plot_number=NULL)
 model_run<-function()
 {
   res<-PRISM_call("model_run", parms1=unprocess_input(thisSession$model_input))
+  thisSession$session_id<-thisSession$last_token
   thisSession$model_output_ex<-PRISM_get_object_list()
   message("Current model is ", thisSession$current_model)
   thisSession$results<-res
-  thisSession$session_id<-thisSession$last_token
   return(res)
 }
+
+
 
 
 
@@ -252,7 +240,9 @@ PRISM_call_s<-function(session,func,...)
 
 
 
-PRISM_get_object_list<-function(token=thisSession$last_token)
+
+
+PRISM_get_object_list<-function(token=thisSession$session_id)
 {
 
   call <- paste("http://", thisSession$url, "/ocpu/tmp/",token,"/",sep="")
@@ -280,7 +270,7 @@ PRISM_filter_object_list<-function(object_list,type="")
 
 
 
-PRISM_get_res_object<-function(token=thisSession$last_token,object)
+PRISM_get_res_object<-function(token=thisSession$session_id,object)
 {
   call <- paste("http://", thisSession$url, "/ocpu/tmp/",token,"/",object,sep="")
   #message(paste("call is ",call))
@@ -306,9 +296,10 @@ fetch_model_output<-function(po)
     plots<-PRISM_filter_object_list(thisSession$model_output_ex,"graphics")
     plots<-plots[as.numeric(po$source)]
     po$value<-PRISM_get_res_object(token=thisSession$session_id, object=paste("graphics/",po$source,sep=""))
-    par(new=F)
-    plot.new()
-    rasterImage(po$value,0,0,1,1)
+    #par(new=F)
+    #plot.new()
+    #rasterImage(po$value,0,0,1,1)
+    class(po)<-"prism_output"
   }
 
   return(po)
@@ -316,12 +307,49 @@ fetch_model_output<-function(po)
 
 
 
+
+
+
 fetch_model_outputs<-function()
 {
   pos<-get_default_output()
+
   for(i in 1:length(pos))
-    pos[[i]]<-fetch_model_output(pos[[i]])
+  {
+    if(canbe_prism_output(pos[[i]]))
+    {
+      pos[[i]]<-fetch_model_output(pos[[i]])
+    }
+    else
+      if(is.list(pos[[i]]))
+      {
+        pos[[i]]<-fetch_model_outputs_l2(pos[[i]])
+      }
+      else pos[[i]]<-fetch_model_output(pos[[i]])
+  }
+
   return(pos)
+}
+
+
+fetch_model_outputs_l2<-function(po)
+{
+  out<-po
+  for(i in 1:length(out))
+  {
+    if(canbe_prism_output(out[[i]]))
+    {
+      out[[i]]<-fetch_model_output(out[[i]])
+    }
+    else
+      if(is.list(out[[i]]))
+      {
+        out[[i]]<-fetch_model_outputs_l2(out[[i]])
+      }
+    else out[[i]]<-fetch_model_output(out[[i]])
+  }
+
+  return(out)
 }
 
 
@@ -329,12 +357,25 @@ fetch_model_outputs<-function()
 
 
 
-#' @export
 process_json<-function(y)
 {
   return(fromJSON(content(y),simplifyMatrix=FALSE))
 }
 
+
+
+#' @export
+get_session_info<-function()
+{
+  return(thisSession)
+}
+
+
+#' @export
+temp<-function()
+{
+  return(getwd())
+}
 
 
 
