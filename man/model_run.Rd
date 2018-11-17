@@ -4,7 +4,7 @@
 \alias{model_run}
 \title{Executes PRISM model}
 \usage{
-model_run()
+model_run(input = NULL)
 }
 \arguments{
 \item{parms}{required custom parameters for current model}

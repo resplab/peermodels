@@ -1,7 +1,9 @@
-#Version 2018.11.01
+#Version 2018.11.04
+
+prism_input_types<-c("numeric/scalar","numeric/vector","numeric/matrix","string/scalar","string/vector","string/matrix","file/csv")
 
 #' @export
-prism_input <- function(value, type="guess", group="", default=NULL, range=c(NULL,NULL), title="", description="", control="")
+prism_input <- function(value, type="", group="", default=NULL, range=c(NULL,NULL), title="", description="", control="")
 {
   me <- list(
     value=value,
@@ -13,8 +15,7 @@ prism_input <- function(value, type="guess", group="", default=NULL, range=c(NUL
     control=control
   )
 
-  if(is.vector(value)) {if(length(value)==1) me$type<-"scalar" else me$type<-"vector"}
-  if(is.matrix(value)) me$type<-"matrix"
+  if(type=="")  me$type<-guess_prism_input_type(me)
 
   ## Set the name for the class
   class(me) <- append(class(me),"prism_input")
@@ -22,6 +23,14 @@ prism_input <- function(value, type="guess", group="", default=NULL, range=c(NUL
 }
 
 
+
+guess_prism_input_type<-function(p_inp)
+{
+  if(is.numeric(p_inp$value)) type="numeric" else type="string"
+  if(is.vector(p_inp$value)) {if(length(p_inp$value)<=1) type<-paste(type,"/scalar",sep="") else type<-paste(type,"/vector",sep="")}
+  if(is.matrix(p_inp$value)) {type<-paste(type,"/matrix",sep="")}
+  return(type)
+}
 
 
 
@@ -33,8 +42,6 @@ print <- function(x)
 {
   UseMethod("print",x)
 }
-
-
 print.prism_input<-function(x)
 {
   print.listof(x)
@@ -125,7 +132,9 @@ to_prism_input<-function(x)
 
 
 
-#type=c("scalar","vector","matrix","data.frame","graphic/url","graphic/data","file/url","file/data")
+
+
+prism_output_types<-c("numeric/scalar","numeric/vector","numeric/matrix","string/scalar","string/vector","string/matrix","file/csv","graphic/url","graphic/data")
 #' @export
 prism_output <- function(title="", type="numeric", source="", group="", value=NULL, description="")
 {
@@ -167,6 +176,22 @@ canbe_prism_output<-function(...)
   yn<-sort(names(y))
   if(length(xn)==length(yn) && sum(xn==yn)==length(xn)) return(T) else return(F)
 }
+
+#' @export
+to_prism_output<-function(x)
+{
+  if(is.list(x))
+  {
+    out<-prism_output()
+    for(nm in names(out))
+      if(!is.null(x[nm])) out[nm]<-x[nm]
+      return(out)
+  }
+  return(prism_output(x))
+}
+
+
+
 
 #' @export
 print.prism_output<-function(x)
