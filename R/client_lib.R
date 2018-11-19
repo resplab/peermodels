@@ -1,6 +1,3 @@
-library(httr)
-library(jsonlite)
-
 thisSession <- new.env()
 
 on_load<-function()
@@ -14,10 +11,10 @@ on_load<-function()
 #' Checks to see if model is available in PRISM
 #'
 #' @param model_name tment benefit at that marker value
-#' @param address Server address. Default is "localhost:5656". Could be an IP address, for example: 122.103.54.12.
+#' @param address Server address. Default is "prism.resp.core.ubc.ca". Could be an IP address, for example: 122.103.54.12.
 #' @return 0 for sucess and 1 for error
 #' @export
-connect_to_model<-function(model_name, address = "localhost:5656")
+connect_to_model<-function(model_name, address = "prism.resp.core.ubc.ca")
 {
   on_load()
   thisSession$url <- address
@@ -303,7 +300,8 @@ generate_default_output_structure_l2<-function(root_element)
 PRISM_call<-function(func,...)
 {
   call <- paste("http://", thisSession$url, "/ocpu/library/",thisSession$current_model,"/R/gateway_json",...length(),sep="")
-  message(paste("call is ",call))
+  message("Current model is ", thisSession$current_model)
+  message(paste("call is ", call))
   arg<-list(func=func, parms=...)
 
   x<-POST(call,body=toJSON(arg), content_type_json())
@@ -342,6 +340,7 @@ PRISM_call<-function(func,...)
 PRISM_call_s<-function(session,func,...)
 {
   call <- paste("http://", thisSession$url, "/ocpu/library/",thisSession$curent_model,"/R/gateway_json",...length(),"_s",sep="")
+  message("Current model is ", thisSession$current_model)
   message(paste("call is ",call))
   arg<-list(session=session, func=func, parms=...)
 

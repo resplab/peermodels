@@ -1,6 +1,6 @@
 Package: prism
 Title: Client-side R API wrapper for PRISM clinical prediction models
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: c(person("amin", "adibi", email = "adibi@alumni.ubc.ca", role = c("aut", "cre")),
              person("Mohsen", "Sadatsafavi", email = "mohsen.sadatsafavi@ubc.ca", role = c("aut", "cph")))
 Description: PRISM will enable our models to be easily accessible to the research community.
@@ -9,7 +9,6 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports:
-    opencpu,
     jsonlite,
-    httr,
-RoxygenNote: 6.1.0
+    httr
+RoxygenNote: 6.1.1

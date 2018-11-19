@@ -4,12 +4,12 @@
 \alias{connect_to_model}
 \title{Checks to see if model is available in PRISM}
 \usage{
-connect_to_model(model_name, address = "localhost:5656")
+connect_to_model(model_name, address = "prism.resp.core.ubc.ca")
 }
 \arguments{
 \item{model_name}{tment benefit at that marker value}
 
-\item{address}{Server address. Default is "localhost:5656". Could be an IP address, for example: 122.103.54.12.}
+\item{address}{Server address. Default is "prism.resp.core.ubc.ca". Could be an IP address, for example: 122.103.54.12.}
 }
 \value{
 0 for sucess and 1 for error
