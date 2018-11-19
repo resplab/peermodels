@@ -48,7 +48,6 @@ connect_to_model<-function(model_name, address = "prism.resp.core.ubc.ca")
 #' @export
 get_default_input<-function()
 {
-  message("Current model is ", thisSession$current_model)
   x<-PRISM_call("get_default_input")
   return(process_input(x))
 }
@@ -180,12 +179,9 @@ draw_plots<-function(plot_number=NULL)
 
 
 
-
-
-
 #' Executes PRISM model
 #'
-#' @param parms required custom parameters for current model
+#' @param input required custom parameters for current model
 #' @return 0 for sucess and 1 for error
 #' @export
 model_run<-function(input=NULL)
@@ -355,7 +351,7 @@ PRISM_call_s<-function(session,func,...)
 
   #message(paste("token is:",token))
 
-  url<-paste("http://", address, "/ocpu/tmp/",token,"/R/.val",sep="")
+  url<-paste("http://", thisSession$url, "/ocpu/tmp/",token,"/R/.val",sep="")
   #message(url)
   url<-paste("http://", thisSession$url, "/ocpu/tmp/",token,"/R/.val",sep="")
   message(url)
