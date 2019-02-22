@@ -1,15 +1,47 @@
-#Version 2018.11.04
+#Version 2019.02.16
 
-prism_input_types<-c("numeric/scalar","numeric/vector","numeric/matrix","string/scalar","string/vector","string/matrix","file/csv")
 
 #' @export
-prism_input <- function(value, type="", group="", default=NULL, range=c(NULL,NULL), title="", description="", control="")
+INPUT_TYPE_NUMERIC_SCALAR<-"numeric-scalar"
+#' @export
+INPUT_TYPE_NUMERIC_VECTOR<-"numeric-vector"
+#' @export
+INPUT_TYPE_NUMERIC_MATRIX<-"numeric-matrix"
+#' @export
+INPUT_TYPE_STRING_SCALAR<-"string-scalar"
+#' @export
+INPUT_TYPE_STRING_VECTOR<-"string-vector"
+#' @export
+INPUT_TYPE_STRING_MATRIX<-"string-matrix"
+#' @export
+INPUT_TYPE_FILE_CSV<-"file-csv"
+
+#' @export
+INPUT_LIMIT_RANGE<-"range"
+#' @export
+INPUT_LIMIT_SINGLE<-"single"
+#' @export
+INPUT_LIMIT_MULTIPLE<-"multiple"
+
+#' @export
+INPUT_CONTROL_TEXTBOX<-"textbox"
+#' @export
+INPUT_CONTROL_SLIDER<-"slider"
+#' @export
+INPUT_CONTROL_DROPDOWN<-"dropdown"
+#' @export
+INPUT_CONTROL_RADIOBUTTON<-"radiobutton"
+#' @export
+INPUT_CONTROL_LIST<-"list"
+
+#' @export
+prism_input <- function(type="", group="", default_value=NULL, limit=c(NULL,NULL), limit_type=c("range","single","multiple"), title="", description="", control="")
 {
   me <- list(
-    value=value,
     type = type,
-    default = default,
-    range=range,
+    default_value = default_value,
+    limit=limit,
+    limit_type=limit_type,
     title=title,
     description=description,
     control=control
@@ -107,17 +139,21 @@ canbe_prism_input<-function(...)
 }
 
 
+
+
+
 #' @export
 to_prism_input<-function(x)
+#x is a list which hopefully has all that is needed!
 {
   if(is.list(x))
   {
-    out<-prism_input(value=x$value)
-    for(nm in names(out))
-      if(!is.null(x[nm])) out[nm]<-x[nm]
-      return(out)
+    out<-prism_input()
+    for(nm in names(out)) out[[nm]]<-x[[nm]]
+    return(out)
   }
-  return(prism_input(x))
+  else
+    out<-prism_input(default_value = x)
 }
 
 
@@ -134,7 +170,7 @@ to_prism_input<-function(x)
 
 
 
-prism_output_types<-c("numeric/scalar","numeric/vector","numeric/matrix","string/scalar","string/vector","string/matrix","file/csv","graphic/url","graphic/data")
+prism_output_types<-c("numeric/scalar","numeric/vector","numeric/matrix","string/scalar","string/vector","string/matrix","file/csv","graphics/url","graphics/data")
 #' @export
 prism_output <- function(title="", type="numeric", source="", group="", value=NULL, description="")
 {
@@ -201,5 +237,17 @@ print.prism_output<-function(x)
 }
 
 
+
+
+#' @export
+plot.prism_output<-function(po)
+{
+  if(po$type=="graphics/url")
+  {
+    plt_data<-content(GET(po$source))
+    plot.new()
+    rasterImage(plt_data,0,0,1,1)
+  }
+}
 
 
