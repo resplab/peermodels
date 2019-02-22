@@ -36,12 +36,8 @@ check_model<-function(model_name)
 #' @param address Server address. Default is "prism.resp.core.ubc.ca". Could be an IP address, for example: 122.103.54.12.
 #' @return 0 for sucess and 1 for error
 #' @export
-<<<<<<< HEAD:R/1client_lib.R
 connect_to_model<-function(model_name, api_key="", address = "prism.resp.core.ubc.ca")
 #TODO: http:// at the beginning can be optional. Currently it must be absent otherwise error!;
-=======
-connect_to_model<-function(model_name, address = "prism.resp.core.ubc.ca")
->>>>>>> 6d6944b1792f4a1d645611d5ecfd0cf88916f2ae:R/client_lib.R
 {
   on_load()
   thisSession$url <- address
@@ -287,18 +283,7 @@ draw_plots<-function(plot_number=NULL)
 #' @export
 model_run<-function(input=NULL)
 {
-  if(is.null(input))
-  {
-    if(is.null(thisSession$input))
-    {
-      thisSession$input<-thisSession$default_input
-    }
-    input<-thisSession$input
-  }
-  else
-  {
-    thisSession$input<-input
-  }
+  thisSession$input<-input
 
   res<-PRISM_call("prism_model_run", parms1=input)
 
@@ -440,36 +425,6 @@ PRISM_call<-function(func,...)
   return(res)
 }
 
-
-
-
-
-<<<<<<< HEAD:R/1client_lib.R
-=======
-PRISM_call_s<-function(session,func,...)
-{
-  call <- paste("http://", thisSession$url, "/ocpu/library/",thisSession$curent_model,"/R/gateway_json",...length(),"_s",sep="")
-  message("Current model is ", thisSession$current_model)
-  message(paste("call is ",call))
-  arg<-list(session=session, func=func, parms=...)
-
-  x<-POST(call,body=toJSON(arg), content_type_json())
-
-  if(x$status_code!=200 && x$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(x$content, 16L))))
-
-  #message(paste("x statargus is",x$status_code))
-
-  token<-x$headers$'x-ocpu-session'
-  thisSession$last_token<-token
-
-  #message(paste("token is:",token))
-
-  url<-paste("http://", thisSession$url, "/ocpu/tmp/",token,"/R/.val",sep="")
-  #message(url)
-  url<-paste("http://", thisSession$url, "/ocpu/tmp/",token,"/R/.val",sep="")
-  message(url)
-  get <- url
->>>>>>> 6d6944b1792f4a1d645611d5ecfd0cf88916f2ae:R/client_lib.R
 
 
 
