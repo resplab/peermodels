@@ -10,7 +10,7 @@ connect_to_model(model_name, api_key = "",
 \arguments{
 \item{model_name}{tment benefit at that marker value}
 
-\item{address}{Server address. Default is "localhost:5656". Could be an IP address, for example: 122.103.54.12.}
+\item{address}{Server address. Default is "prism.resp.core.ubc.ca". Could be an IP address, for example: 122.103.54.12.}
 }
 \value{
 0 for sucess and 1 for error

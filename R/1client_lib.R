@@ -1,11 +1,12 @@
 thisSession <- new.env()
 
+
+
 on_load<-function()
 {
   thisSession <- new.env()
   options(stringsAsFactors = FALSE)
 }
-
 
 
 
@@ -40,14 +41,16 @@ connect_to_model<-function(model_name, api_key="", address = "prism.resp.core.ub
 #TODO: http:// at the beginning can be optional. Currently it must be absent otherwise error!;
 {
   on_load()
+  thisSession$api_key<-api_key
+  thisSession$session_id<-NULL
   thisSession$url <- address
   thisSession$current_model <- model_name
 
-  x<-PRISM_call("connect_to_model",parms1=model_name, parms2=api_key)
+  x<-PRISM_call("connect_to_model",api_key=api_key)
 
   res<-process_input(x)
 
-  if(res$result==FALSE) {message("Connection failed"); return(FALSE) }
+  if(res$error_code!=0) {message("There was an error in connecting to the model."); return(res$error_code) }
 
   thisSession$session_id<-res$session_id
 
@@ -72,6 +75,8 @@ disconnect_from_model<-function()
 {
   #fF this is a sessioned connection then the session id will be automatically passed so do not have to submit it!
   x<-PRISM_call("disconnect_from_model")
+
+  on_load()
 
   res<-process_input(x)
 
@@ -285,7 +290,7 @@ model_run<-function(input=NULL)
 {
   thisSession$input<-input
 
-  res<-PRISM_call("prism_model_run", parms1=input)
+  res<-PRISM_call("prism_model_run", model_input=input)
 
   thisSession$output_location<-thisSession$last_location
   thisSession$output_list<-NULL
@@ -380,21 +385,25 @@ generate_default_output_structure_l2<-function(root_element)
 
 
 
-
+#' @export
 PRISM_call<-function(func,...)
 {
-
-  call <- paste("http://", thisSession$url, "/ocpu/library/",thisSession$current_model,"/R/gateway_json",...length(),sep="")
+  call <- paste("http://", thisSession$url, "/ocpu/library/",thisSession$current_model,"/R/gateway/json",sep="")
   message("Current model is ", thisSession$current_model)
-  message(paste("call is ", call))
+
   arg<-list(func=func, parms=...)
 
+  #If session id is available, use it; otherwise use API key itself.
   if(!is.null(thisSession$session_id) && thisSession$session_id!="")
   {
-    call<-paste(call,"_s",sep="")
     arg<-c(session_id=thisSession$session_id,arg)
   }
+  else
+  {
+    if(is.null(arg$api_key)) arg<-c(api_key=thisSession$api_key,arg)
+  }
 
+  message(paste("call is ", call))
 
   x<-POST(call,body=toJSON(arg), content_type_json())
 
@@ -405,22 +414,10 @@ PRISM_call<-function(func,...)
     return(NULL)
   }
 
-  #message(paste("x statargus is",x$status_code))
-
   location<-x$headers$'x-ocpu-session'
   thisSession$last_location<-location
 
-  #message(paste("location is:",location))
-
-  url<-paste("http://", thisSession$url, "/ocpu/tmp/",location,"/R/.val",sep="")
-  message(url)
-  get <- url
-
-  y<-GET (get)
-
-  if(y$status_code!=200 && y$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(y$content, 16L))))
-
-  res<-process_json(y)
+  res<-fromJSON(content(x)[[1]])
 
   return(res)
 }
@@ -567,6 +564,22 @@ temp<-function()
 
 
 
+#' @export
+hand_wave<-function(server,model_name)
+{
+  call <- paste("http://", server, "/ocpu/library/",model_name,"/R/test",sep="")
+  message(paste("call is ", call))
+
+  x<-POST(call,body="", content_type_json())
+
+  if(x$status_code!=200 && x$status_code!=201)
+  {
+    message(paste("Error:"),rawToChar(as.raw(strtoi(x$content, 16L))))
+    return(FALSE)
+  }
+
+  return(x)
+}
 
 
 

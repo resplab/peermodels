@@ -244,7 +244,7 @@ plot.prism_output<-function(po)
 {
   if(po$type=="graphics/url")
   {
-    plt_data<-content(GET(po$source))
+    plt_data<-httr::content(httr::GET(po$source))
     plot.new()
     rasterImage(plt_data,0,0,1,1)
   }

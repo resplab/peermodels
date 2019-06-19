@@ -7,7 +7,7 @@
 model_run(input = NULL)
 }
 \arguments{
-\item{parms}{required custom parameters for current model}
+\item{input}{required custom parameters for current model}
 }
 \value{
 0 for sucess and 1 for error
