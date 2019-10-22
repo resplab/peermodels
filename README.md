@@ -10,14 +10,13 @@ This package provides a user-friendly API interface in R for clinical prediction
 ### Example
 ```
 library(prism)
-connect_to_model('epicR')
-get_default_input()
-get_output_structure()
-input <- get_default_input()
-input
-names(input)
-View(input)
-input$global_parameters$time_horizon
-input$global_parameters$time_horizon <- 10
-model_run(input = input)
+connect_to_model("epicPrism",api_key = "123456")
+model_run()  #Run with default inputs
+model_input<-get_default_input()  
+model_input
+names(model_input)
+View(model_input)
+model_input$global_parameters$time_horizon
+model_input$global_parameters$time_horizon <- 10
+model_run(input = model_input)  #Run with modified input
 ```
