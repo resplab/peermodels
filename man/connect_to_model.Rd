@@ -4,8 +4,7 @@
 \alias{connect_to_model}
 \title{Checks to see if model is available in PRISM}
 \usage{
-connect_to_model(model_name, api_key = "",
-  address = "prism.resp.core.ubc.ca")
+connect_to_model(model_name, api_key = "", address = "prism.resp.core.ubc.ca")
 }
 \arguments{
 \item{model_name}{tment benefit at that marker value}
