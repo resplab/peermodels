@@ -10,27 +10,6 @@ on_load<-function()
 
 
 
-
-check_model<-function(model_name)
-{
-  call <- paste("http://", thisSession$url, "/ocpu/library/", thisSession$current_model,"/info", sep="")
-  x<-POST(call)
-  if(x$status_code!=200)
-  {
-    message("Error connecting to model");
-    return(NULL);
-  }
-  else
-  {
-    return(0)
-  }
-}
-
-
-
-
-
-
 #' Checks to see if model is available in PRISM
 #'
 #' @param model_name name of the model
@@ -38,23 +17,25 @@ check_model<-function(model_name)
 #' @return 0 for success and 1 for error
 #' @export
 connect_to_model<-function(model_name, api_key="", local_server = FALSE)
-#TODO: http:// at the beginning can be optional. Currently it must be absent otherwise error!;
 {
-
-  if (!local_server)  {address <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/run")}
-    else {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )}
+  model_name <- str_remove(model_name, "Prism")
+  if (!local_server)  {address <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/run")
+  addressObj <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/tmp/")}
+  else {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
+  addressObj <- paste0("http://localhost:5656/ocpu/library/", model_name,"/tmp/" )}
 
   on_load()
   thisSession$api_key<-api_key
   thisSession$session_id<-NULL
   thisSession$url <- address
+  thisSession$urlObj <- addressObj
   thisSession$current_model <- model_name
 
   x<-PRISM_call("connect_to_model",api_key=api_key)
 
   res<-process_input(x)
 
-  if(res$error_code!=0) {message("There was an error in connecting to the model."); return(res$error_code) }
+  if(res$error_code!=0) {message("Error: Could not connect to the model."); return(res$error_code) }
 
   thisSession$session_id<-res$session_id
 
@@ -66,11 +47,6 @@ connect_to_model<-function(model_name, api_key="", local_server = FALSE)
   #thisSession$output_structure<-get_output_structure()
   #return(0)
 }
-
-
-
-
-
 
 
 
@@ -284,7 +260,6 @@ draw_plots<-function(plot_number=NULL)
 }
 
 
-
 #' Executes PRISM model
 #'
 #' @param input required custom parameters for current model
@@ -307,12 +282,8 @@ model_run<-function(input=NULL)
   #{
   #  thisSession$output_structure<-generate_default_output_structure()
   #}
-
-  #thisSession$output<-fetch_outputs()
-
   return(res)
 }
-
 
 
 generate_default_output_structure<-function()
@@ -331,7 +302,7 @@ generate_default_output_structure<-function()
       if(is.null(dim(element)))
         if(length(element)==1) type<-"numeric" else type<-"vector"
         else type="matrix"
-      out[[length(out)+1]]<-prism_output(title = nm, type = type, source =paste("$",nm,sep=""))
+        out[[length(out)+1]]<-prism_output(title = nm, type = type, source =paste("$",nm,sep=""))
     }
     names(out)[length(out)]<-nm
   }
@@ -363,16 +334,11 @@ generate_default_output_structure_l2<-function(root_element)
     {
       if(is.null(dim(element)))
         if(length(element)==1) type<-"numeric" else type<-"vector"
-      else type="matrix"
-      out[length(out)+1]<-prism_output(title = nm, type = type, source =paste("$",nm,sep=""))
+        else type="matrix"
+        out[length(out)+1]<-prism_output(title = nm, type = type, source =paste("$",nm,sep=""))
     }
     names(out)[length(out)]<-nm
   }
-
-
-
-
-
 
   plots<-PRISM_filter_output_object_list(thisSession$model_output_objects,"graphics")
   if(length(plots))
@@ -387,13 +353,11 @@ generate_default_output_structure_l2<-function(root_element)
 }
 
 
-
-
 #' @export
 PRISM_call<-function(func,...)
 {
   call <- thisSession$url
-  message("Current model is ", thisSession$current_model)
+  message(paste0("Selected model is ", thisSession$current_model))
 
   arg<-list(func=func, parms=...)
 
@@ -407,7 +371,7 @@ PRISM_call<-function(func,...)
     if(is.null(arg$api_key)) arg$api_key<-thisSession$api_key
   }
 
-  message(paste("call is ", call))
+  message(paste0("Calling server at ", call))
 
   x<-POST(call, add_headers('x-prism-auth-user'=arg$api_key), body=toJSON(arg), content_type_json())
 
@@ -428,17 +392,14 @@ PRISM_call<-function(func,...)
 
 
 
-
-
-
-
-
 PRISM_get_output_object_list<-function(location=thisSession$output_location)
 {
-  call <- paste("http://", thisSession$url, "/ocpu/tmp/",location,"/",sep="")
-  message(paste("call is ",call))
+  call <- paste0(thisSession$urlObj, location, "/")
+  message(paste("Calling server at ", call))
 
-  x<-GET(call)
+  #x<-POST(call, add_headers('x-prism-auth-user'=arg$api_key), body=toJSON(arg), content_type_json())
+
+  x<-GET(call, add_headers('x-prism-auth-user'=thisSession$api_key))
 
   if(x$status_code!=200 && x$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(x$content, 16L))))
 
@@ -451,8 +412,6 @@ PRISM_get_output_object_list<-function(location=thisSession$output_location)
 }
 
 
-
-
 PRISM_filter_output_object_list<-function(object_list,type="")
 {
   if(type=="") return(object_list)
@@ -460,10 +419,9 @@ PRISM_filter_output_object_list<-function(object_list,type="")
 }
 
 
-
 PRISM_get_output_object<-function(location=thisSession$output_location,object)
 {
-  call <- paste("http://", thisSession$url, "/ocpu/tmp/",location,"/",object,sep="")
+  call <- paste0(thisSession$urlObj,location,"/",object)
   #message(paste("call is ",call))
 
   x<-content(GET(call))
@@ -474,90 +432,11 @@ PRISM_get_output_object<-function(location=thisSession$output_location,object)
 }
 
 
-
-
-fetch_output<-function(po)
-{
-  if(substring(po$source,1,1)=="$")
-  {
-    po$value<-thisSession$result[[substring(po$source,2)]]
-  }
-  if(po$type=="graphic/url")
-  {
-    plots<-PRISM_filter_output_object_list(thisSession$output_list,"graphics")
-    plots<-plots[as.numeric(po$source)]
-    po$value<-PRISM_get_output_object(location=thisSession$output_location, object=paste("graphics/",po$source,sep=""))
-    po$type<-"graphic/data"
-    class(po)<-"prism_output"
-  }
-
-  return(po)
-}
-
-
-
-
-
-
-fetch_outputs<-function()
-{
-  pos<-thisSession$output_structure
-
-  for(i in 1:length(pos))
-  {
-    if(canbe_prism_output(pos[[i]]))
-    {
-      pos[[i]]<-fetch_output(pos[[i]])
-    }
-    else
-      if(is.list(pos[[i]]))
-      {
-        pos[[i]]<-fetch_outputs_l2(pos[[i]])
-      }
-      else pos[[i]]<-fetch_output(pos[[i]])
-  }
-
-  return(pos)
-}
-
-
-fetch_outputs_l2<-function(po)
-{
-  out<-po
-  for(i in 1:length(out))
-  {
-    if(canbe_prism_output(out[[i]]))
-    {
-      out[[i]]<-fetch_output(out[[i]])
-    }
-    else
-      if(is.list(out[[i]]))
-      {
-        out[[i]]<-fetch_outputs_l2(out[[i]])
-      }
-    else out[[i]]<-fetch_output(out[[i]])
-  }
-
-  return(out)
-}
-
-
-
-
-
-
-process_json<-function(y)
-{
-  return(fromJSON(content(y)))
-}
-
-
 #' @export
 get_session_info<-function()
 {
   return(thisSession)
 }
-
 
 
 
