@@ -1,6 +1,6 @@
-Package: prism
-Title: Client-side R API wrapper for PRISM clinical prediction models
-Version: 0.5.2
+Package: peermodels
+Title: Client-side R API wrapper for Peer Models Network PRISM server 
+Version: 0.6.0
 Authors@R: c(person("amin", "adibi", email = "adibi@alumni.ubc.ca", role = c("aut", "cre")),
              person("Mohsen", "Sadatsafavi", email = "mohsen.sadatsafavi@ubc.ca", role = c("aut", "cph")))
 Description: PRISM will enable our models to be easily accessible to the research community.

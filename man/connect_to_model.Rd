@@ -4,15 +4,15 @@
 \alias{connect_to_model}
 \title{Checks to see if model is available in PRISM}
 \usage{
-connect_to_model(model_name, api_key = "", address = "prism.resp.core.ubc.ca")
+connect_to_model(model_name, api_key = "", local_server = FALSE)
 }
 \arguments{
-\item{model_name}{tment benefit at that marker value}
+\item{model_name}{name of the model}
 
-\item{address}{Server address. Default is "prism.resp.core.ubc.ca". Could be an IP address, for example: 122.103.54.12.}
+\item{local_server}{whether or not the call should be directed to the server on localhost. Default is FALSE.}
 }
 \value{
-0 for sucess and 1 for error
+0 for success and 1 for error
 }
 \description{
 Checks to see if model is available in PRISM

@@ -33,13 +33,17 @@ check_model<-function(model_name)
 
 #' Checks to see if model is available in PRISM
 #'
-#' @param model_name tment benefit at that marker value
-#' @param address Server address. Default is "prism.resp.core.ubc.ca". Could be an IP address, for example: 122.103.54.12.
-#' @return 0 for sucess and 1 for error
+#' @param model_name name of the model
+#' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
+#' @return 0 for success and 1 for error
 #' @export
-connect_to_model<-function(model_name, api_key="", address = "prism.resp.core.ubc.ca")
+connect_to_model<-function(model_name, api_key="", local_server = FALSE)
 #TODO: http:// at the beginning can be optional. Currently it must be absent otherwise error!;
 {
+
+  if (!local_server)  {address <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/run")}
+    else {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )}
+
   on_load()
   thisSession$api_key<-api_key
   thisSession$session_id<-NULL
@@ -284,7 +288,7 @@ draw_plots<-function(plot_number=NULL)
 #' Executes PRISM model
 #'
 #' @param input required custom parameters for current model
-#' @return 0 for sucess and 1 for error
+#' @return 0 for success and 1 for error
 #' @export
 model_run<-function(input=NULL)
 {
@@ -388,7 +392,7 @@ generate_default_output_structure_l2<-function(root_element)
 #' @export
 PRISM_call<-function(func,...)
 {
-  call <- paste("http://", thisSession$url, "/ocpu/library/",thisSession$current_model,"/R/gateway/json",sep="")
+  call <- thisSession$url
   message("Current model is ", thisSession$current_model)
 
   arg<-list(func=func, parms=...)
@@ -400,12 +404,12 @@ PRISM_call<-function(func,...)
   }
   else
   {
-    if(is.null(arg$api_key)) arg<-c(api_key=thisSession$api_key,arg)
+    if(is.null(arg$api_key)) arg$api_key<-thisSession$api_key
   }
 
   message(paste("call is ", call))
 
-  x<-POST(call,body=toJSON(arg), content_type_json())
+  x<-POST(call, add_headers('x-prism-auth-user'=arg$api_key), body=toJSON(arg), content_type_json())
 
   if(x$status_code!=200 && x$status_code!=201)
   {
@@ -553,34 +557,6 @@ get_session_info<-function()
 {
   return(thisSession)
 }
-
-
-#' @export
-temp<-function()
-{
-  return(getwd())
-}
-
-
-
-
-#' @export
-hand_wave<-function(server,model_name)
-{
-  call <- paste("http://", server, "/ocpu/library/",model_name,"/R/test",sep="")
-  message(paste("call is ", call))
-
-  x<-POST(call,body="", content_type_json())
-
-  if(x$status_code!=200 && x$status_code!=201)
-  {
-    message(paste("Error:"),rawToChar(as.raw(strtoi(x$content, 16L))))
-    return(FALSE)
-  }
-
-  return(x)
-}
-
 
 
 

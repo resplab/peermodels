@@ -10,7 +10,7 @@ model_run(input = NULL)
 \item{input}{required custom parameters for current model}
 }
 \value{
-0 for sucess and 1 for error
+0 for success and 1 for error
 }
 \description{
 Executes PRISM model
