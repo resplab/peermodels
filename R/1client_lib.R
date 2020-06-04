@@ -22,7 +22,7 @@ connect_to_model<-function(model_name, api_key="", local_server = FALSE)
   if (!local_server)  {address <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/run")
   addressObj <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/tmp/")}
   else {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
-  addressObj <- paste0("http://localhost:5656/ocpu/library/", model_name,"/tmp/" )}
+  addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
 
   on_load()
   thisSession$api_key<-api_key
