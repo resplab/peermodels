@@ -231,7 +231,7 @@ get_plots<-function()
   counter<-1;
   for(obj in plots)
   {
-    source<-paste("http://", thisSession$url, "/ocpu/tmp/",thisSession$output_location,"/",obj,sep="")
+    source<-paste(thisSession$urlObj,thisSession$output_location,"/",obj,sep="")
     out[[counter]]<-prism_output(type="graphics/url",source = source)
     counter<-counter+1
   }
