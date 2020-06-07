@@ -31,6 +31,8 @@ connect_to_model<-function(model_name, api_key="", local_server = FALSE)
   thisSession$urlObj <- addressObj
   thisSession$current_model <- model_name
 
+
+
   x<-PRISM_call("connect_to_model",api_key=api_key)
 
   res<-process_input(x)
@@ -382,7 +384,14 @@ PRISM_call<-function(func,...)
     return(NULL)
   }
 
-  location<-x$headers$'x-ocpu-session'
+  if (str_detect(thisSession$url, "https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/")) {
+    location<-x$headers$'x-prism-session-id'
+    }
+
+    else {
+      (location<-x$headers$'x-ocpu-session')
+    }
+
   thisSession$last_location<-location
 
   res<-fromJSON(content(x)[[1]])
@@ -394,14 +403,14 @@ PRISM_call<-function(func,...)
 
 PRISM_get_output_object_list<-function(location=thisSession$output_location)
 {
+  message(paste0("location is ", location))
   call <- paste0(thisSession$urlObj, location, "/")
-  message(paste("Calling server at ", call))
-
-  #x<-POST(call, add_headers('x-prism-auth-user'=arg$api_key), body=toJSON(arg), content_type_json())
+  message(paste0("Calling server at ", call))
 
   x<-GET(call, add_headers('x-prism-auth-user'=thisSession$api_key))
 
   if(x$status_code!=200 && x$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(x$content, 16L))))
+  #x$headers$`content-type`<- "text/plain; charset=utf-8"
 
   str<-content(x)
   con<-textConnection(str)
@@ -424,7 +433,7 @@ PRISM_get_output_object<-function(location=thisSession$output_location,object)
   call <- paste0(thisSession$urlObj,location,"/",object)
   #message(paste("call is ",call))
 
-  x<-content(GET(call))
+  x<-content(GET(call, add_headers('x-prism-auth-user'=thisSession$api_key)))
 
   #if(x$status_code!=200 && x$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(x$content, 16L))))
 
