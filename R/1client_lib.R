@@ -16,13 +16,19 @@ on_load<-function()
 #' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
 #' @return 0 for success and 1 for error
 #' @export
-connect_to_model<-function(model_name, api_key="", local_server = FALSE)
+connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_router = FALSE)
 {
   model_name <- str_remove(model_name, "Prism")
-  if (!local_server)  {address <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/run")
+
+  if (!local_server && !bypass_router)  {address <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/run")
   addressObj <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/tmp/")}
-  else {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
+
+  if (!local_server && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gateway/json")
+  addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
+
+  if (local_server) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
   addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
+
 
   on_load()
   thisSession$api_key<-api_key
