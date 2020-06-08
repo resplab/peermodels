@@ -409,7 +409,7 @@ PRISM_call<-function(func,...)
 
 PRISM_get_output_object_list<-function(location=thisSession$output_location)
 {
-  message(paste0("location is ", location))
+  message(paste0("Session ID:", location))
   call <- paste0(thisSession$urlObj, location, "/")
   message(paste0("Calling server at ", call))
 
