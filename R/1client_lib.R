@@ -1,13 +1,11 @@
 thisSession <- new.env()
 
 
-
 on_load<-function()
 {
   thisSession <- new.env()
   options(stringsAsFactors = FALSE)
 }
-
 
 
 #' Checks to see if model is available in PRISM
@@ -20,8 +18,8 @@ connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_
 {
   model_name <- str_remove(model_name, "Prism")
 
-  if (!local_server && !bypass_router)  {address <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/run")
-  addressObj <- paste0("https://admin-prism-api.cp.prism-ubc.linaralabs.com/route/", model_name, "/tmp/")}
+  if (!local_server && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/run")
+  addressObj <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/tmp/")}
 
   if (!local_server && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gateway/json")
   addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
@@ -72,15 +70,6 @@ disconnect_from_model<-function()
 }
 
 
-
-
-
-
-
-
-
-
-
 #' Returns default PRISM model input
 #'
 #' @export
@@ -106,13 +95,6 @@ get_default_input_style<-function()
     out[[names(x[i])]]<-to_prism_input(x[[i]])
   return(out)
 }
-
-
-
-
-
-
-
 
 
 #Evaluates if each item in the input can become a prism_input class
@@ -141,10 +123,6 @@ process_input<-function(inp)
   else return(inp)
 }
 
-
-
-
-
 unprocess_input<-function(inp)
 {
   if(inherits(inp,"prism_input")) return(inp$value)
@@ -165,7 +143,7 @@ unprocess_input<-function(inp)
 
 #' Sets PRISM model inputs
 #'
-#' @return 0 for sucess and 1 for error
+#' @return 0 for success and 1 for error
 #' @export
 set_model_input<-function(input)
 {
@@ -176,7 +154,7 @@ set_model_input<-function(input)
 
 #' Returns PRISM model input
 #'
-#' @return 0 for sucess and 1 for error
+#' @return 0 for success and 1 for error
 #' @export
 get_model_input<-function()
 {
