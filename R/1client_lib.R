@@ -141,27 +141,27 @@ unprocess_input<-function(inp)
 
 
 
-#' Sets PRISM model inputs
+#' #' Sets PRISM model inputs
+#' #'
+#' #' @return 0 for success and 1 for error
+#' #' @export
+#' set_model_input<-function(input)
+#' {
+#'   message("Current model is ", thisSession$current_model)
+#'   thisSession$input <- input
+#' }
+
 #'
-#' @return 0 for success and 1 for error
-#' @export
-set_model_input<-function(input)
-{
-  message("Current model is ", thisSession$current_model)
-  thisSession$input <- input
-}
-
-
-#' Returns PRISM model input
+#' #' Returns PRISM model input
+#' #'
+#' #' @return 0 for success and 1 for error
+#' #' @export
+#' get_model_input<-function()
+#' {
+#'   message("Current model is ", thisSession$current_model)
+#'   return(thisSession$input)
+#' }
 #'
-#' @return 0 for success and 1 for error
-#' @export
-get_model_input<-function()
-{
-  message("Current model is ", thisSession$current_model)
-  return(thisSession$input)
-}
-
 
 
 
