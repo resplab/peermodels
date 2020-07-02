@@ -4,7 +4,12 @@
 \alias{connect_to_model}
 \title{Checks to see if model is available in PRISM}
 \usage{
-connect_to_model(model_name, api_key = "", local_server = FALSE)
+connect_to_model(
+  model_name,
+  api_key = "",
+  local_server = FALSE,
+  bypass_router = FALSE
+)
 }
 \arguments{
 \item{model_name}{name of the model}

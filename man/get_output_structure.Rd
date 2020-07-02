@@ -2,7 +2,15 @@
 % Please edit documentation in R/1client_lib.R
 \name{get_output_structure}
 \alias{get_output_structure}
-\title{Returns default PRISM model output}
+\title{#' Sets PRISM model inputs
+#'
+#' @return 0 for success and 1 for error
+#' @export
+set_model_input<-function(input)
+{
+  message("Current model is ", thisSession$current_model)
+  thisSession$input <- input
+}}
 \usage{
 get_output_structure()
 }
@@ -10,5 +18,16 @@ get_output_structure()
 0 for sucess and 1 for error
 }
 \description{
+#' Returns PRISM model input
+#'
+#' @return 0 for success and 1 for error
+#' @export
+get_model_input<-function()
+{
+  message("Current model is ", thisSession$current_model)
+  return(thisSession$input)
+}
+}
+\details{
 Returns default PRISM model output
 }
