@@ -1,7 +1,8 @@
 <!-- badges: start -->
 [![R build status](https://github.com/resplab/peermodels/workflows/R-CMD-check/badge.svg)](https://github.com/resplab/peermodels/actions)
 [![CRAN status](https://www.r-pkg.org/badges/version/peermodels)](https://CRAN.R-project.org/package=peermodels)
-<!-- badges: end -->[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+
 
 # peermodels
 The `peermodels` package allows easy access to models hosted on the [Peer Models Network (PMN)](https://www.peermodelsnetwork.com). The Peer Models Network is an initiative to make statistical models that inform healthcare decisions available online, along with educational videos and other resources to help understand how they work. Learn more about PMN by visiting [www.peermodelsnetwork.com](https://www.peermodelsnetwork.com) and the PMN Model Repository page at [models.peermodelsnetwork.com](https://models.peermodelsnetwork.com).
