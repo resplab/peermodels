@@ -4,10 +4,24 @@
 \alias{model_run}
 \title{Executes PRISM model}
 \usage{
-model_run(input = NULL)
+model_run(
+  input = NULL,
+  model_name = NULL,
+  local_server = FALSE,
+  bypass_router = FALSE,
+  async = FALSE
+)
 }
 \arguments{
 \item{input}{required custom parameters for current model}
+
+\item{model_name}{name of the model}
+
+\item{local_server}{whether or not the call should be directed to the server on localhost. Default is FALSE.}
+
+\item{bypass_router}{bypass server API router, for debugging purposes}
+
+\item{async}{should the model be called in async mode?}
 }
 \value{
 0 for success and 1 for error

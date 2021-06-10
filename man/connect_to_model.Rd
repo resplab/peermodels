@@ -8,7 +8,8 @@ connect_to_model(
   model_name,
   api_key = "",
   local_server = FALSE,
-  bypass_router = FALSE
+  bypass_router = FALSE,
+  async = FALSE
 )
 }
 \arguments{

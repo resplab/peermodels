@@ -4,7 +4,21 @@
 \alias{get_default_input}
 \title{Returns default PRISM model input}
 \usage{
-get_default_input()
+get_default_input(
+  model_name = NULL,
+  local_server = FALSE,
+  bypass_router = FALSE,
+  async = FALSE
+)
+}
+\arguments{
+\item{model_name}{name of the model}
+
+\item{local_server}{whether or not the call should be directed to the server on localhost. Default is FALSE.}
+
+\item{bypass_router}{bypass server API router, for debugging purposes}
+
+\item{input}{required custom parameters for current model}
 }
 \description{
 Returns default PRISM model input
