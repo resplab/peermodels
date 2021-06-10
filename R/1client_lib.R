@@ -30,8 +30,7 @@ connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_
   if (!local_server && async && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gateway_async/json")
   addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
 
-  if (!local_server && async && !bypass_router)  {message('Error. Not developed yet!')}
-
+  if (!local_server && async && !bypass_router)  {stop('Error. Not developed yet!')}
 
   if (local_server && async) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway_async/json" )
   addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
