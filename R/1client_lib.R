@@ -11,7 +11,6 @@ on_load<-function()
 
 handshake<-function(model_name, api_key="", local_server = FALSE, bypass_router = FALSE, async = FALSE) #TODO subsequent calls such as get_default_input are problematic with async. Perhaps best to deprecate connect_to_model
 {
-  .Deprecated("model_run")
   model_name <- str_remove(model_name, "Prism")
 
   if (!local_server && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/run")
