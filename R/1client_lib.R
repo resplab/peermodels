@@ -14,7 +14,7 @@ on_load<-function()
 #' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
 #' @return 0 for success and 1 for error
 #' @export
-connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_router = FALSE)
+connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_router = FALSE, async = FALSE) #TODO subsequent calls such as get_default_input are problematic with async. Perhaps best to deprecate connect_to_model
 {
   model_name <- str_remove(model_name, "Prism")
 
@@ -25,6 +25,15 @@ connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_
   addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
 
   if (local_server) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
+  addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
+
+  if (!local_server && async && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gateway_async/json")
+  addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
+
+  if (!local_server && async && !bypass_router)  {message('Error. Not developed yet!')}
+
+
+  if (local_server && async) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway_async/json" )
   addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
 
 
