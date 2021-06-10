@@ -7,6 +7,7 @@
 model_run(
   input = NULL,
   model_name = NULL,
+  api_key = "",
   local_server = FALSE,
   bypass_router = FALSE,
   async = FALSE
@@ -16,6 +17,8 @@ model_run(
 \item{input}{required custom parameters for current model}
 
 \item{model_name}{name of the model}
+
+\item{api_key}{API key}
 
 \item{local_server}{whether or not the call should be directed to the server on localhost. Default is FALSE.}
 
