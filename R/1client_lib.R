@@ -8,13 +8,8 @@ on_load<-function()
 }
 
 
-#' Checks to see if model is available in PRISM
-#'
-#' @param model_name name of the model
-#' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
-#' @return 0 for success and 1 for error
-#' @export
-connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_router = FALSE)
+
+handshake<-function(model_name, api_key="", local_server = FALSE, bypass_router = FALSE, async = FALSE)
 {
   model_name <- str_remove(model_name, "Prism")
 
@@ -25,6 +20,75 @@ connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_
   addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
 
   if (local_server) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
+  addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
+
+  if (!local_server && async && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gatewayasync/json")
+  addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
+
+  if (!local_server && async && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/async/run")
+  addressObj <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/tmp/")} #TODO check addressObj for async
+
+  if (local_server && async) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gatewayasync/json" )
+  addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
+
+
+  on_load()
+  thisSession$api_key<-api_key
+  thisSession$session_id<-NULL
+  thisSession$url <- address
+  thisSession$urlObj <- addressObj
+  thisSession$current_model <- model_name
+
+
+
+  x<-PRISM_call("connect_to_model",api_key=api_key)
+
+  res<-process_input(x)
+
+  if(res$error_code!=0) {message("Error: Could not connect to the model."); return(res$error_code) }
+
+  thisSession$session_id<-res$session_id
+
+  message(res$description)
+
+  return(res)
+
+  #thisSession$default_input<-get_default_input()
+  #thisSession$output_structure<-get_output_structure()
+  #return(0)
+}
+
+
+#' Checks to see if model is available in PRISM
+#'
+#' @param model_name name of the model
+#' @param api_key API key
+#' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
+#' @param bypass_router bypass server API router, for debugging purposes
+#' @param async should the model be called in async mode?
+#' @return 0 for success and 1 for error
+#' @export
+connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_router = FALSE, async = FALSE)
+{
+  .Deprecated("model_run")
+  model_name <- str_remove(model_name, "Prism")
+
+  if (!local_server && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/run")
+  addressObj <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/tmp/")}
+
+  if (!local_server && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gateway/json")
+  addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
+
+  if (local_server) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
+  addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
+
+  if (!local_server && async && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gatewayasync/json")
+  addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
+
+  if (!local_server && async && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/async/run")
+  addressObj <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/tmp/")} #TODO check addressObj for async
+
+  if (local_server && async) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gatewayasync/json" )
   addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
 
 
@@ -56,25 +120,16 @@ connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_
 
 
 
-#' @export
-disconnect_from_model<-function()
-{
-  #fF this is a sessioned connection then the session id will be automatically passed so do not have to submit it!
-  x<-PRISM_call("disconnect_from_model")
-
-  on_load()
-
-  res<-process_input(x)
-
-  return(res)
-}
-
-
 #' Returns default PRISM model input
 #'
+#' @param model_name name of the model
+#' @param api_key API key
+#' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
+#' @param bypass_router bypass server API router, for debugging purposes
 #' @export
-get_default_input<-function()
+get_default_input<-function(model_name=NULL, api_key="", local_server=FALSE, bypass_router=FALSE)
 {
+  handshake(model_name = model_name, api_key = api_key, local_server = local_server, bypass_router = bypass_router, async = FALSE)
   x<-PRISM_call("get_default_input")
   return(x)
 }
@@ -205,7 +260,8 @@ show_output<-function(p_output)
 
 
 
-
+#' Retrieves plots generated by the model in R Session
+#' @return URL of plots
 #' @export
 get_plots<-function()
 {
@@ -227,7 +283,9 @@ get_plots<-function()
 
 
 
-
+#' draws plots generated by the model in R Session
+#' @param plot_number the number of the plot to be rendered
+#' @return graphical object in R
 #' @export
 draw_plots<-function(plot_number=NULL)
 {
@@ -249,10 +307,17 @@ draw_plots<-function(plot_number=NULL)
 #' Executes PRISM model
 #'
 #' @param input required custom parameters for current model
+#' @param model_name name of the model
+#' @param api_key API key
+#' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
+#' @param bypass_router bypass server API router, for debugging purposes
+#' @param async should the model be called in async mode?
 #' @return 0 for success and 1 for error
 #' @export
-model_run<-function(input=NULL)
+model_run<-function(input=NULL, model_name=NULL, api_key = "", local_server=FALSE, bypass_router=FALSE, async=FALSE)
 {
+  handshake(model_name = model_name, api_key = api_key, local_server = local_server, bypass_router = bypass_router, async = async)
+
   thisSession$input<-input
 
   res<-PRISM_call("prism_model_run", model_input=input)
@@ -262,13 +327,15 @@ model_run<-function(input=NULL)
 
   thisSession$result<-res
 
-  #thisSession$model_output_objects<-PRISM_get_output_object_list()
+    #thisSession$model_output_objects<-PRISM_get_output_object_list()
 
-  #if(is.null(thisSession$output_structure))
-  #{
-  #  thisSession$output_structure<-generate_default_output_structure()
-  #}
+    #if(is.null(thisSession$output_structure))
+    #{
+    #  thisSession$output_structure<-generate_default_output_structure()
+    #}
+
   return(res)
+
 }
 
 
@@ -339,7 +406,6 @@ generate_default_output_structure_l2<-function(root_element)
 }
 
 
-#' @export
 PRISM_call<-function(func,...)
 {
   call <- thisSession$url
@@ -425,6 +491,8 @@ PRISM_get_output_object<-function(location=thisSession$output_location,object)
 }
 
 
+#' returns PRISM server session info
+#' @return session ID
 #' @export
 get_session_info<-function()
 {

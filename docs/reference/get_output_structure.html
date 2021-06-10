@@ -6,7 +6,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Returns default PRISM model output — get_output_structure • peermodels</title>
+<title>#' Sets PRISM model inputs
+#'
+#' @return 0 for success and 1 for error
+#' @export
+set_model_input&lt;-function(input)
+
+  message("Current model is ", thisSession$current_model)
+  thisSession$input &lt;- input — get_output_structure • peermodels</title>
 
 
 <!-- jquery -->
@@ -39,8 +46,22 @@
 
 
 
-<meta property="og:title" content="Returns default PRISM model output — get_output_structure" />
-<meta property="og:description" content="Returns default PRISM model output" />
+<meta property="og:title" content="#' Sets PRISM model inputs
+#'
+#' @return 0 for success and 1 for error
+#' @export
+set_model_input&lt;-function(input)
+
+  message("Current model is ", thisSession$current_model)
+  thisSession$input &lt;- input — get_output_structure" />
+<meta property="og:description" content="#' Returns PRISM model input
+#'
+#' @return 0 for success and 1 for error
+#' @export
+get_model_input&amp;lt;-function()
+
+  message(&quot;Current model is &quot;, thisSession$current_model)
+  return(thisSession$input)" />
 
 
 
@@ -72,7 +93,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peermodels</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8.0</span>
       </span>
     </div>
 
@@ -80,7 +101,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -103,21 +124,38 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Returns default PRISM model output</h1>
+    <h1>#' Sets PRISM model inputs
+#'
+#' @return 0 for success and 1 for error
+#' @export
+set_model_input&lt;-function(input)
+
+  message("Current model is ", thisSession$current_model)
+  thisSession$input &lt;- input</h1>
     
     <div class="hidden name"><code>get_output_structure.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Returns default PRISM model output</p>
+    <p>#' Returns PRISM model input
+#'
+#' @return 0 for success and 1 for error
+#' @export
+get_model_input&lt;-function()
+
+  message("Current model is ", thisSession$current_model)
+  return(thisSession$input)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_output_structure</span>()</pre>
+    <pre class="usage"><span class='fu'>get_output_structure</span><span class='op'>(</span><span class='op'>)</span></pre>
 
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>0 for sucess and 1 for error</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Returns default PRISM model output</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -134,7 +172,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

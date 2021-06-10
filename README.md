@@ -28,26 +28,7 @@ The code snippet below provides an example of a how to call a prediction model, 
 
 ```
 > library(peermodels)
-> connect_to_model("accept", api_key = "aaHYJJb4hcrmBYY3")
-Selected model is accept
-Calling server at https://prism.peermodelsnetwork.com/route/accept/run
-This is acceptPrism - PRISM enabled!
-$error_code
-[1] 0
-
-$session_id
-[1] ""
-
-$version
-[1] "0.5.0"
-
-$description
-[1] "This is acceptPrism - PRISM enabled!"
-```
-
-Once access to the model is verified, we can proceed to get default inputs of the model:
-```
-> input <- get_default_input()
+> input <- get_default_input("accept", api_key = "[YOUR_API_KEY]")
 Selected model is accept
 Calling server at https://prism.peermodelsnetwork.com/route/accept/run
 > 
@@ -68,7 +49,7 @@ The input shows that the default COPD patient is a 70 years old male who is a cu
 > input$ICS <- 0
 > 
 > 
-> results <- model_run(input)
+> results <- model_run(input, "accept", api_key = "[YOUR_API_KEY")
 Selected model is accept
 Calling server at https://prism.peermodelsnetwork.com/route/accept/run
 ```
