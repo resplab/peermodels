@@ -1,40 +1,3 @@
-#Version 2019.02.16
-
-
-#' @export
-INPUT_TYPE_NUMERIC_SCALAR<-"numeric-scalar"
-#' @export
-INPUT_TYPE_NUMERIC_VECTOR<-"numeric-vector"
-#' @export
-INPUT_TYPE_NUMERIC_MATRIX<-"numeric-matrix"
-#' @export
-INPUT_TYPE_STRING_SCALAR<-"string-scalar"
-#' @export
-INPUT_TYPE_STRING_VECTOR<-"string-vector"
-#' @export
-INPUT_TYPE_STRING_MATRIX<-"string-matrix"
-#' @export
-INPUT_TYPE_FILE_CSV<-"file-csv"
-
-#' @export
-INPUT_LIMIT_RANGE<-"range"
-#' @export
-INPUT_LIMIT_SINGLE<-"single"
-#' @export
-INPUT_LIMIT_MULTIPLE<-"multiple"
-
-#' @export
-INPUT_CONTROL_TEXTBOX<-"textbox"
-#' @export
-INPUT_CONTROL_SLIDER<-"slider"
-#' @export
-INPUT_CONTROL_DROPDOWN<-"dropdown"
-#' @export
-INPUT_CONTROL_RADIOBUTTON<-"radiobutton"
-#' @export
-INPUT_CONTROL_LIST<-"list"
-
-#' @export
 prism_input <- function(type="", group="", default_value=NULL, limit=c(NULL,NULL), limit_type=c("range","single","multiple"), title="", description="", control="")
 {
   me <- list(
@@ -55,7 +18,6 @@ prism_input <- function(type="", group="", default_value=NULL, limit=c(NULL,NULL
 }
 
 
-
 guess_prism_input_type<-function(p_inp)
 {
   if(is.numeric(p_inp$value)) type="numeric" else type="string"
@@ -63,10 +25,6 @@ guess_prism_input_type<-function(p_inp)
   if(is.matrix(p_inp$value)) {type<-paste(type,"/matrix",sep="")}
   return(type)
 }
-
-
-
-
 
 
 
@@ -78,7 +36,6 @@ print.prism_input<-function(x)
 {
   print.listof(x)
 }
-
 
 
 Ops<-function(e1,e2)
@@ -110,26 +67,12 @@ Math.prism_input<-function(x,...)
 }
 
 
-
 Summary<-function(...,na.rm)
 {
   UseMethod("Summary",...,na.rm)
 }
 
-#' @export
-Summary.prism_input<-function(...,na.rm)
-{
-  message("hi")
-  args<-list(...)
-  args <- lapply(args, function(x) {
-    if(sum(class(x)=="prism_input")>0) x$value
-  })
-  do.call(.Generic, c(args, na.rm = na.rm))
-}
 
-
-
-#' @export
 canbe_prism_input<-function(...)
 {
   y<-prism_input(0)
@@ -140,9 +83,6 @@ canbe_prism_input<-function(...)
 
 
 
-
-
-#' @export
 to_prism_input<-function(x)
 #x is a list which hopefully has all that is needed!
 {
@@ -158,20 +98,7 @@ to_prism_input<-function(x)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 prism_output_types<-c("numeric/scalar","numeric/vector","numeric/matrix","string/scalar","string/vector","string/matrix","file/csv","graphics/url","graphics/data")
-#' @export
 prism_output <- function(title="", type="numeric", source="", group="", value=NULL, description="")
 {
   me <- list(
@@ -190,9 +117,6 @@ prism_output <- function(title="", type="numeric", source="", group="", value=NU
 
 
 
-
-
-#' @export
 as.prism_output<-function(...)
 {
   x<-list(...)[[1]]
@@ -204,7 +128,7 @@ as.prism_output<-function(...)
   return(out)
 }
 
-#' @export
+
 canbe_prism_output<-function(...)
 {
   y<-prism_output()
@@ -213,7 +137,7 @@ canbe_prism_output<-function(...)
   if(length(xn)==length(yn) && sum(xn==yn)==length(xn)) return(T) else return(F)
 }
 
-#' @export
+
 to_prism_output<-function(x)
 {
   if(is.list(x))
@@ -224,30 +148,6 @@ to_prism_output<-function(x)
       return(out)
   }
   return(prism_output(x))
-}
-
-
-
-
-#' @export
-print.prism_output<-function(x)
-{
-  if(length(x$value)>100) x$value=paste("[Data of length",length(x$value),"]")
-  dput(unclass(x))
-}
-
-
-
-
-#' @export
-plot.prism_output<-function(po)
-{
-  if(po$type=="graphics/url")
-  {
-    plt_data<-httr::content(httr::GET(po$source))
-    plot.new()
-    rasterImage(plt_data,0,0,1,1)
-  }
 }
 
 
