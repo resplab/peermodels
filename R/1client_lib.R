@@ -27,10 +27,11 @@ connect_to_model<-function(model_name, api_key="", local_server = FALSE, bypass_
   if (local_server) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
   addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
 
-  if (!local_server && async && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gateway_async/json")
+  if (!local_server && async && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gatewayasync/json")
   addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
 
-  if (!local_server && async && !bypass_router)  {stop('Error. Not developed yet!')}
+  if (!local_server && async && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/async/run")
+  addressObj <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/tmp/")} #TODO check addressObj for async
 
   if (local_server && async) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway_async/json" )
   addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
@@ -263,20 +264,22 @@ model_run<-function(input=NULL)
 {
   thisSession$input<-input
 
-  res<-PRISM_call("prism_model_run", model_input=input)
+    res<-PRISM_call("prism_model_run", model_input=input)
 
-  thisSession$output_location<-thisSession$last_location
-  thisSession$output_list<-NULL
+    thisSession$output_location<-thisSession$last_location
+    thisSession$output_list<-NULL
 
-  thisSession$result<-res
+    thisSession$result<-res
 
-  #thisSession$model_output_objects<-PRISM_get_output_object_list()
+    #thisSession$model_output_objects<-PRISM_get_output_object_list()
 
-  #if(is.null(thisSession$output_structure))
-  #{
-  #  thisSession$output_structure<-generate_default_output_structure()
-  #}
+    #if(is.null(thisSession$output_structure))
+    #{
+    #  thisSession$output_structure<-generate_default_output_structure()
+    #}
+
   return(res)
+
 }
 
 
