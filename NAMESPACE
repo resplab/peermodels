@@ -2,6 +2,7 @@
 
 export(connect_to_model)
 export(draw_plots)
+export(get_async_results)
 export(get_default_input)
 export(get_default_input_style)
 export(get_output_structure)

@@ -526,5 +526,43 @@ get_session_info<-function()
   return(thisSession)
 }
 
+#' @export
+get_async_results <- function(model_name=NULL, api_key = "", local_server=FALSE, bypass_router=FALSE, token)
+{
+  async <- FALSE
+  model_name <- str_remove(model_name, "Prism")
+
+  if (!local_server && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/run")
+  addressObj <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/tmp/")}
+
+  if (!local_server && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gateway/json")
+  addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
+
+  if (local_server) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
+  addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
+
+  if (!local_server && async && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gatewayasync/json")
+  addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
+
+  if (!local_server && async && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/async/run")
+  addressObj <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/tmp/")} #TODO check addressObj for async
+
+  if (local_server && async) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gatewayasync/json" )
+  addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
+
+
+  on_load()
+  thisSession$api_key<-api_key
+  thisSession$session_id<-NULL
+  thisSession$url <- address
+  thisSession$urlObj <- addressObj
+  thisSession$current_model <- model_name
+
+  thisSession$input<-input
+
+  return(PRISM_call("prism_get_async_results", token=token))
+}
+
+
 
 
