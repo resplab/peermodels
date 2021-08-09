@@ -294,7 +294,13 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
   this_session$last_location <- x$headers$'x-ocpu-session'
   if(!is.null(api_key)) this_session$api_key <- api_key
 
-  res<-fromJSON(content(x)[[1]])
+  res <- content(x)[[1]]
+
+  if (is.numeric(res)) { #handling error messages
+    res<-paste0("Error ", res)
+  } else {
+    res<-fromJSON(res)
+}
 
   return(res)
 }
