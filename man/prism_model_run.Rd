@@ -15,15 +15,13 @@ prism_model_run(
 \arguments{
 \item{model_name}{name of the model}
 
+\item{model_input}{required custom parameters for current model}
+
 \item{api_key}{API key}
 
+\item{server}{server address. Defaults tothe peermodelsnetwork repository.}
+
 \item{async}{should the model be called in async mode?}
-
-\item{input}{required custom parameters for current model}
-
-\item{local_server}{whether or not the call should be directed to the server on localhost. Default is FALSE.}
-
-\item{bypass_router}{bypass server API router, for debugging purposes}
 }
 \value{
 0 for success and 1 for error

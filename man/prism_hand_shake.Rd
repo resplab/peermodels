@@ -4,7 +4,7 @@
 \alias{prism_hand_shake}
 \title{Basic checks to see if model is available in PRISM}
 \usage{
-prism_hand_shake(model_name, server = default_server())
+prism_hand_shake(model_name, server = prism_default_server())
 }
 \arguments{
 \item{model_name}{name of the model}

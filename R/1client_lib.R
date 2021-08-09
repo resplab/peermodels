@@ -231,11 +231,10 @@ prism_draw_plots<-function(plot_number=NULL)
 
 #' Executes PRISM model
 #'
-#' @param input required custom parameters for current model
 #' @param model_name name of the model
+#' @param model_input required custom parameters for current model
 #' @param api_key API key
-#' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
-#' @param bypass_router bypass server API router, for debugging purposes
+#' @param server server address. Defaults tothe peermodelsnetwork repository.
 #' @param async should the model be called in async mode?
 #' @return 0 for success and 1 for error
 #' @export
