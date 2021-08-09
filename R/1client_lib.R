@@ -296,6 +296,7 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
 
   res <- content(x)[[1]]
 
+  if (!validate(res)) {stop("Non-standard response received from server.")}
   if (is.numeric(res)) { #handling error messages
     res<-paste0("Error ", res)
   } else {
