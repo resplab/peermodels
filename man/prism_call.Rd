@@ -12,6 +12,8 @@ prism_call(func, base_url, api_key = NULL, ...)
 \item{base_url}{the url to call}
 
 \item{api_key}{API key}
+
+\item{...}{other parameters}
 }
 \value{
 processed (from JSON to R object result of the call)

@@ -19,7 +19,7 @@ prism_default_server <- function()
 }
 
 
-make_url <- function(model_name, base_url, type=c("call","tmp","info"))
+make_url <- function(model_name, base_url, type=c("call","tmp","info"), async=FALSE)
 {
   if(substring(base_url,nchar(base_url))=="/") base_url <- substring(base_url,1,nchar(base_url)-1)
 
@@ -28,6 +28,7 @@ make_url <- function(model_name, base_url, type=c("call","tmp","info"))
     if(type=="call")
     {
       out <- paste0(base_url,"/",model_name,"/run")
+      if (async) {out <- paste0(base_url,"/",model_name,"/async/run")}
     }
     if(type=="tmp")
     {
@@ -43,6 +44,7 @@ make_url <- function(model_name, base_url, type=c("call","tmp","info"))
     if(type=="call")
     {
       out <- paste0(base_url,"/library/", model_name, "/R/gateway/json")
+      if (async) {out <- paste0(base_url,"/library/", model_name, "/R/gatewayasync/json")}
     }
     if(type=="tmp")
     {
@@ -245,7 +247,7 @@ prism_model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, ser
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- prism_default_server()
 
-  address <- make_url(model_name, server, "call")
+  address <- make_url(model_name, server, "call", async = async)
 
   res<-prism_call("prism_model_run",  base_url = address, model_input=model_input)
 
@@ -267,6 +269,7 @@ prism_model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, ser
 #' @param func function to call
 #' @param base_url  the url to call
 #' @param api_key API key
+#' @param ... other parameters
 #' @return processed (from JSON to R object result of the call)
 #' @export
 prism_call<-function(func, base_url, api_key = NULL, ...)
@@ -336,42 +339,26 @@ prism_get_output_object<-function(location=this_session$output_location,object)
 
 
 
-
+#' Retrieves async results
+#' @param model_name name of the model
+#' @param api_key API key
+#' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
+#' @param bypass_router bypass server API router, for debugging purposes
+#' @param token async job token
+#' @return processed (from JSON to R object result of the call)
 #' @export
 prism_get_async_results <- function(model_name=NULL, api_key = "", local_server=FALSE, bypass_router=FALSE, token)
 {
-  async <- FALSE
-  model_name <- str_remove(model_name, "Prism")
+  if(is.null(model_name)) model_name <- this_session$model_name
+  if(is.null(api_key)) api_key <- this_session$api_key
+  if(is.null(server)) server <- this_session$server
+  if(is.null(server)) server <- prism_default_server()
 
-  if (!local_server && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/run")
-  addressObj <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/tmp/")}
+  address <- make_url(model_name, server, "tmp") #TODO check the call address for async
 
-  if (!local_server && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gateway/json")
-  addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
+  res <- prism_call("prism_get_async_results", base_url = address, api_key = api_key, token=token)
 
-  if (local_server) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gateway/json" )
-  addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
-
-  if (!local_server && async && bypass_router)  {address <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/library/", model_name, "Prism/R/gatewayasync/json")
-  addressObj <- paste0("http://model-", model_name, ".cp.prism-ubc.linaralabs.com/ocpu/tmp/")}
-
-  if (!local_server && async && !bypass_router)  {address <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/async/run")
-  addressObj <- paste0("https://prism.peermodelsnetwork.com/route/", model_name, "/tmp/")} #TODO check addressObj for async
-
-  if (local_server && async) {address <- paste0("http://localhost:5656/ocpu/library/", model_name,"Prism/R/gatewayasync/json" )
-  addressObj <- paste0("http://localhost:5656/ocpu","/tmp/" )}
-
-
-  on_load()
-  this_session$api_key<-api_key
-  this_session$session_id<-NULL
-  this_session$url <- address
-  this_session$urlObj <- addressObj
-  this_session$current_model <- model_name
-
-  this_session$input<-input
-
-  return(prism_call("prism_get_async_results", token=token))
+  return(res)
 }
 
 
