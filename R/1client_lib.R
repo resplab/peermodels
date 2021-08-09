@@ -297,9 +297,9 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
   res <- content(x)[[1]]
 
   if (!validate(as.character(res))) {stop("Non-standard response received from server.")} #handling error messages
-  if (is.numeric(res)) {
+  if (is.numeric(res)) { # error number is received from server
     stop(res)
-  } else {
+  } else { #standard JSON is received
     res<-fromJSON(res)
 }
 
