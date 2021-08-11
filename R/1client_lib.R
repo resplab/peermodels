@@ -349,13 +349,15 @@ prism_get_output_object<-function(location=this_session$output_location,object)
 #' Retrieves async results
 #' @param model_name name of the model
 #' @param api_key API key
-#' @param local_server whether or not the call should be directed to the server on localhost. Default is FALSE.
+#' @param server Server address. Defaults to PMN.
 #' @param bypass_router bypass server API router, for debugging purposes
 #' @param token async job token
 #' @return processed (from JSON to R object result of the call)
 #' @export
-prism_get_async_results <- function(model_name=NULL, api_key = "", local_server=FALSE, bypass_router=FALSE, token)
+prism_get_async_results <- function(model_name = NULL, token = NULL, api_key = NULL, server = NULL)
 {
+
+  if(is.null(token)) stop("Async job token not provided")
   if(is.null(model_name)) model_name <- this_session$model_name
   if(is.null(api_key)) api_key <- this_session$api_key
   if(is.null(server)) server <- this_session$server

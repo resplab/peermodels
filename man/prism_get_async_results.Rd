@@ -6,22 +6,21 @@
 \usage{
 prism_get_async_results(
   model_name = NULL,
-  api_key = "",
-  local_server = FALSE,
-  bypass_router = FALSE,
-  token
+  token = NULL,
+  api_key = NULL,
+  server = NULL
 )
 }
 \arguments{
 \item{model_name}{name of the model}
 
+\item{token}{async job token}
+
 \item{api_key}{API key}
 
-\item{local_server}{whether or not the call should be directed to the server on localhost. Default is FALSE.}
+\item{server}{Server address. Defaults to PMN.}
 
 \item{bypass_router}{bypass server API router, for debugging purposes}
-
-\item{token}{async job token}
 }
 \value{
 processed (from JSON to R object result of the call)
