@@ -363,7 +363,7 @@ prism_get_async_results <- function(model_name = NULL, token = NULL, api_key = N
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- prism_default_server()
 
-  address <- make_url(model_name, server, "tmp") #TODO check the call address for async
+  address <- make_url(model_name, server, "call")
 
   res <- prism_call("prism_get_async_results", base_url = address, api_key = api_key, token=token)
 
