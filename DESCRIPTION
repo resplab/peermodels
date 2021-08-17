@@ -1,9 +1,9 @@
 Package: peermodels
-Title: Client-side R API wrapper for Peer Models Network PRISM server 
-Version: 0.8.999
+Title: Client-side R API wrapper for Peer Models Network model repository 
+Version: 0.9.0
 Authors@R: c(person("amin", "adibi", email = "adibi@alumni.ubc.ca", role = c("aut", "cre")),
              person("Mohsen", "Sadatsafavi", email = "mohsen.sadatsafavi@ubc.ca", role = c("aut", "cph")))
-Description: PRISM will enable our models to be easily accessible to the research community.
+Description: Enables direct cloud access to healthcare decision models.
 Depends: R (>= 3.6.0)
 License: GPL-3
 Encoding: UTF-8
