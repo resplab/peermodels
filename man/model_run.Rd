@@ -5,24 +5,21 @@
 \title{Executes PRISM model}
 \usage{
 model_run(
-  input = NULL,
   model_name = NULL,
-  api_key = "",
-  local_server = FALSE,
-  bypass_router = FALSE,
+  model_input = NULL,
+  api_key = NULL,
+  server = NULL,
   async = FALSE
 )
 }
 \arguments{
-\item{input}{required custom parameters for current model}
-
 \item{model_name}{name of the model}
+
+\item{model_input}{required custom parameters for current model}
 
 \item{api_key}{API key}
 
-\item{local_server}{whether or not the call should be directed to the server on localhost. Default is FALSE.}
-
-\item{bypass_router}{bypass server API router, for debugging purposes}
+\item{server}{server address. Defaults tothe peermodelsnetwork repository.}
 
 \item{async}{should the model be called in async mode?}
 }

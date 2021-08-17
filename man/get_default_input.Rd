@@ -4,21 +4,14 @@
 \alias{get_default_input}
 \title{Returns default PRISM model input}
 \usage{
-get_default_input(
-  model_name = NULL,
-  api_key = "",
-  local_server = FALSE,
-  bypass_router = FALSE
-)
+get_default_input(model_name = NULL, api_key = NULL, server = NULL)
 }
 \arguments{
-\item{model_name}{name of the model}
+\item{model_name}{name of the model. If null, it will be set to the last call's value.}
 
-\item{api_key}{API key}
+\item{api_key}{API key. If null, it will be set to the last call's value.}
 
-\item{local_server}{whether or not the call should be directed to the server on localhost. Default is FALSE.}
-
-\item{bypass_router}{bypass server API router, for debugging purposes}
+\item{server}{Server name. If null, it will be set to the last call's value}
 }
 \description{
 Returns default PRISM model input
