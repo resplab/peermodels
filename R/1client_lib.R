@@ -115,7 +115,7 @@ get_default_input<-function(model_name=NULL, api_key=NULL, server=NULL)
 
   url <- make_url(model_name,server,"call")
 
-  x<-prism_call(func="prism_get_default_input", base_url = url, api_key = api_key)
+  x<-prism_call(func="get_default_input", base_url = url, api_key = api_key)
 
   this_session$model_name <- model_name
   this_session$api_key <- api_key
