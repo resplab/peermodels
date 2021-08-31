@@ -281,8 +281,8 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
   message(paste0("Calling server at ", call))
 
   arg <- list(func=func,param=...)
-
-  x<-POST(call, add_headers('x-prism-auth-user'=api_key), body=toJSON(arg), content_type_json())
+  c   <- NULL
+  x   <- POST(call, add_headers('x-prism-auth-user'=api_key), body=toJSON(arg), content_type_json())
 
   if(x$status_code!=200 && x$status_code!=201)
   {
@@ -350,7 +350,6 @@ get_output_object<-function(location=this_session$output_location,object)
 #' @param model_name name of the model
 #' @param api_key API key
 #' @param server Server address. Defaults to PMN.
-#' @param bypass_router bypass server API router, for debugging purposes
 #' @param token async job token
 #' @return processed (from JSON to R object result of the call)
 #' @export

@@ -11,6 +11,5 @@ LazyData: true
 Imports:
     jsonlite,
     httr,
-    png,
     stringr
 RoxygenNote: 7.1.1
