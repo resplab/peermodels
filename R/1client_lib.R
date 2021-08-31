@@ -114,14 +114,13 @@ get_default_input<-function(model_name=NULL, api_key=NULL, server=NULL)
   this_session$server <- server
 
   url <- make_url(model_name,server,"call")
-
-  x<-prism_call(func="get_default_input", base_url = url, api_key = api_key)
+  default_inputs   <- prism_call(func="get_default_input", base_url = url, api_key = api_key)
 
   this_session$model_name <- model_name
   this_session$api_key <- api_key
   this_session$server <- server
 
-  return(x)
+  return(default_inputs)
 }
 
 
@@ -281,20 +280,20 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
   message(paste0("Calling server at ", call))
 
   arg <- list(func=func,param=...)
-  c   <- NULL
-  x   <- POST(call, add_headers('x-prism-auth-user'=api_key), body=toJSON(arg), content_type_json())
+  request   <- NULL
+  request   <- POST(call, add_headers('x-prism-auth-user'=api_key), body=toJSON(arg), content_type_json())
 
-  if(x$status_code!=200 && x$status_code!=201)
+  if(request$status_code!=200 && request$status_code!=201)
   {
-    message(paste("Error:"),rawToChar(as.raw(strtoi(x$content, 16L))))
-    this_session$last_call_status <- x$last_status_code
+    message(paste("Error:"),rawToChar(as.raw(strtoi(request$content, 16L))))
+    this_session$last_call_status <- request$last_status_code
     return(NULL)
   }
 
-  this_session$last_location <- x$headers$'x-ocpu-session'
+  this_session$last_location <- request$headers$'x-ocpu-session'
   if(!is.null(api_key)) this_session$api_key <- api_key
 
-  res <- content(x)[[1]]
+  res <- content(request)[[1]]
 
   if (!validate(as.character(res))) {stop("Non-standard response received from server.")} #handling error messages
   if (is.numeric(res)) { # error number is received from server
@@ -314,11 +313,12 @@ get_output_object_list<-function(location=this_session$output_location)
   url <- paste0(make_url(this_session$model_name, this_session$server, type="tmp"),"/",location)
   message(paste0("Calling server at ", url))
 
-  x<-GET(url, add_headers('x-prism-auth-user'=this_session$api_key))
+  response <- NULL
+  response <- GET(url, add_headers('x-prism-auth-user'=this_session$api_key))
 
-  if(x$status_code!=200 && x$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(x$content, 16L))))
+  if(response$status_code!=200 && response$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(response$content, 16L))))
 
-  str<-content(x)
+  str<-content(response)
   con<-textConnection(str)
   lines<-readLines(con)
   close(con)
@@ -339,9 +339,9 @@ get_output_object<-function(location=this_session$output_location,object)
   url <- paste0(make_url(this_session$model_name,this_session$server,"tmp"),"/", location,"/",object)
   #message(paste("call is ",call))
 
-  x<-content(GET(url, add_headers('x-prism-auth-user'=this_session$api_key)))
+  res<-content(GET(url, add_headers('x-prism-auth-user'=this_session$api_key)))
 
-  return(x)
+  return(res)
 }
 
 
