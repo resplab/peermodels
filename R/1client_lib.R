@@ -250,7 +250,7 @@ draw_plots<-function(plot_number=NULL)
 #' @param model_name name of the model
 #' @param model_input required custom parameters for current model
 #' @param api_key API key
-#' @param server server address. Defaults tothe peermodelsnetwork repository.
+#' @param server server address. Defaults to the Peer Models Network PRSIM repository.
 #' @param async should the model be called in async mode?
 #' @return 0 for success and 1 for error
 #' @examples
