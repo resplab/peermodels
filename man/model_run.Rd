@@ -19,7 +19,7 @@ model_run(
 
 \item{api_key}{API key}
 
-\item{server}{server address. Defaults tothe peermodelsnetwork repository.}
+\item{server}{server address. Defaults to the Peer Models Network PRSIM repository.}
 
 \item{async}{should the model be called in async mode?}
 }
@@ -30,7 +30,7 @@ model_run(
 Executes PRISM model
 }
 \examples{
-\donotrun{
+\donottest{
 sample_input <- get_default_input(model_name = "epic", api_key = "YOUR_API_KEY")
 sample_input$global_parameters.time_horizon <- 15
 model_run ("epic", model_input = sample_input)

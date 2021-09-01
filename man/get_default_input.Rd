@@ -20,7 +20,7 @@ default model inputs, which can be changed and submitted to the model for a diff
 Returns default PRISM model input
 }
 \examples{
-\donotrun{
+\donottest{
 sample_input <- get_default_input(model_name = "accept", api_key = "YOUR_API_KEY")
 }
 }

@@ -116,7 +116,7 @@ handshake <- function(model_name, server=default_server())
 #' @param server Server address. If null, it will be set to Peer Models Network PRISM server on the first run and to the last call's value on subsequent runs.
 #' @return default model inputs, which can be changed and submitted to the model for a different run.
 #' @examples
-#' \donotrun{
+#' \donottest{
 #' sample_input <- get_default_input(model_name = "accept", api_key = "YOUR_API_KEY")
 #' }
 #' @export
@@ -254,7 +254,7 @@ draw_plots<-function(plot_number=NULL)
 #' @param async should the model be called in async mode?
 #' @return 0 for success and 1 for error
 #' @examples
-#' \donotrun{
+#' \donottest{
 #' sample_input <- get_default_input(model_name = "epic", api_key = "YOUR_API_KEY")
 #' sample_input$global_parameters.time_horizon <- 15
 #' model_run ("epic", model_input = sample_input)
