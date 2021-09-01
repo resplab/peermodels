@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peermodels</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.1</span>
       </span>
     </div>
 
@@ -113,11 +113,10 @@
     </div>
 
     <pre class="usage"><span class='fu'>model_run</span><span class='op'>(</span>
-  input <span class='op'>=</span> <span class='cn'>NULL</span>,
   model_name <span class='op'>=</span> <span class='cn'>NULL</span>,
-  api_key <span class='op'>=</span> <span class='st'>""</span>,
-  local_server <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  bypass_router <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  model_input <span class='op'>=</span> <span class='cn'>NULL</span>,
+  api_key <span class='op'>=</span> <span class='cn'>NULL</span>,
+  server <span class='op'>=</span> <span class='cn'>NULL</span>,
   async <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
@@ -125,24 +124,20 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>input</th>
-      <td><p>required custom parameters for current model</p></td>
-    </tr>
-    <tr>
       <th>model_name</th>
       <td><p>name of the model</p></td>
+    </tr>
+    <tr>
+      <th>model_input</th>
+      <td><p>required custom parameters for current model</p></td>
     </tr>
     <tr>
       <th>api_key</th>
       <td><p>API key</p></td>
     </tr>
     <tr>
-      <th>local_server</th>
-      <td><p>whether or not the call should be directed to the server on localhost. Default is FALSE.</p></td>
-    </tr>
-    <tr>
-      <th>bypass_router</th>
-      <td><p>bypass server API router, for debugging purposes</p></td>
+      <th>server</th>
+      <td><p>server address. Defaults tothe peermodelsnetwork repository.</p></td>
     </tr>
     <tr>
       <th>async</th>

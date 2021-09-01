@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peermodels</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.1</span>
       </span>
     </div>
 
@@ -112,31 +112,22 @@
     <p>Returns default PRISM model input</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_default_input</span><span class='op'>(</span>
-  model_name <span class='op'>=</span> <span class='cn'>NULL</span>,
-  api_key <span class='op'>=</span> <span class='st'>""</span>,
-  local_server <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  bypass_router <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_default_input</span><span class='op'>(</span>model_name <span class='op'>=</span> <span class='cn'>NULL</span>, api_key <span class='op'>=</span> <span class='cn'>NULL</span>, server <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>model_name</th>
-      <td><p>name of the model</p></td>
+      <td><p>name of the model. If null, it will be set to the last call's value.</p></td>
     </tr>
     <tr>
       <th>api_key</th>
-      <td><p>API key</p></td>
+      <td><p>API key. If null, it will be set to the last call's value.</p></td>
     </tr>
     <tr>
-      <th>local_server</th>
-      <td><p>whether or not the call should be directed to the server on localhost. Default is FALSE.</p></td>
-    </tr>
-    <tr>
-      <th>bypass_router</th>
-      <td><p>bypass server API router, for debugging purposes</p></td>
+      <th>server</th>
+      <td><p>Server name. If null, it will be set to the last call's value</p></td>
     </tr>
     </table>
 

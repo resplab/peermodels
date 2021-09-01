@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">peermodels</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.1</span>
       </span>
     </div>
 
@@ -128,9 +128,9 @@
       <tr>
         
         <td>
-          <p><code><a href="connect_to_model.html">connect_to_model()</a></code> </p>
+          <p><code><a href="default_server.html">default_server()</a></code> </p>
         </td>
-        <td><p>Checks to see if model is available in PRISM</p></td>
+        <td><p>Returns the default server path for PRISM server</p></td>
       </tr><tr>
         
         <td>
@@ -140,28 +140,15 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="get_async_results.html">get_async_results()</a></code> </p>
+        </td>
+        <td><p>Retrieves async results</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="get_default_input.html">get_default_input()</a></code> </p>
         </td>
         <td><p>Returns default PRISM model input</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_default_input_style.html">get_default_input_style()</a></code> </p>
-        </td>
-        <td><p>Returns default PRISM model input</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_output_structure.html">get_output_structure()</a></code> </p>
-        </td>
-        <td><p>#' Sets PRISM model inputs
-#'
-#' @return 0 for success and 1 for error
-#' @export
-set_model_input&lt;-function(input)
-
-  message("Current model is ", thisSession$current_model)
-  thisSession$input &lt;- input</p></td>
       </tr><tr>
         
         <td>
@@ -171,15 +158,33 @@ set_model_input&lt;-function(input)
       </tr><tr>
         
         <td>
-          <p><code><a href="get_session_info.html">get_session_info()</a></code> </p>
+          <p><code><a href="get_session.html">get_session()</a></code> </p>
         </td>
-        <td><p>returns PRISM server session info</p></td>
+        <td><p>returns session info</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="handshake.html">handshake()</a></code> </p>
+        </td>
+        <td><p>Basic checks to see if model is available in PRISM</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="model_run.html">model_run()</a></code> </p>
         </td>
         <td><p>Executes PRISM model</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="prism_call.html">prism_call()</a></code> </p>
+        </td>
+        <td><p>Generic call to PRISM server</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="reset_session.html">reset_session()</a></code> </p>
+        </td>
+        <td><p>resets session info.</p></td>
       </tr>
     </tbody>
     </table>
