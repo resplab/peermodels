@@ -3,7 +3,7 @@ Title: Client-side R API Wrapper for Peer Models Network Model Repository
 Version: 0.10.1
 Authors@R: c(person("amin", "adibi", email = "adibi@alumni.ubc.ca", role = c("aut", "cre")),
              person("Mohsen", "Sadatsafavi", email = "mohsen.sadatsafavi@ubc.ca", role = c("aut", "cph")))
-Description: Enables direct cloud access to healthcare decision models hosted on the PRISM server of the Peer Models Network.
+Description: Enables direct cloud access to health care decision models hosted on the PRISM server of the Peer Models Network.
 Depends: R (>= 3.6.0)
 License: GPL-3
 Encoding: UTF-8
