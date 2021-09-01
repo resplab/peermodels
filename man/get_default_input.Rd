@@ -13,6 +13,14 @@ get_default_input(model_name = NULL, api_key = NULL, server = NULL)
 
 \item{server}{Server address. If null, it will be set to Peer Models Network PRISM server on the first run and to the last call's value on subsequent runs.}
 }
+\value{
+default model inputs, which can be changed and submitted to the model for a different run.
+}
 \description{
 Returns default PRISM model input
+}
+\examples{
+\donotrun{
+sample_input <- get_default_input(model_name = "accept", api_key = "YOUR_API_KEY")
+}
 }

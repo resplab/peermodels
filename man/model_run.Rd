@@ -29,3 +29,10 @@ model_run(
 \description{
 Executes PRISM model
 }
+\examples{
+\donotrun{
+sample_input <- get_default_input(model_name = "epic", api_key = "YOUR_API_KEY")
+sample_input$global_parameters.time_horizon <- 15
+model_run ("epic", model_input = sample_input)
+}
+}
