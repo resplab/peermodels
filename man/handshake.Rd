@@ -2,7 +2,7 @@
 % Please edit documentation in R/1client_lib.R
 \name{handshake}
 \alias{handshake}
-\title{Basic checks to see if model is available in PRISM}
+\title{checks to see if a model is available on the cloud server}
 \usage{
 handshake(model_name, server = default_server())
 }
@@ -12,8 +12,11 @@ handshake(model_name, server = default_server())
 \item{server}{base url of the server}
 }
 \value{
-TRUE if the model exists, FALSE if not
+TRUE if model is available on the server, FALSE otherwise
 }
 \description{
-Basic checks to see if model is available in PRISM
+checks to see if a model is available on the cloud server
+}
+\examples{
+handshake("accept")
 }

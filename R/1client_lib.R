@@ -80,18 +80,28 @@ reset_session <- function()
 
 
 
-#' Basic checks to see if model is available in PRISM
+#' checks to see if a model is available on the cloud server
 #'
 #' @param model_name name of the model
 #' @param server base url of the server
-#' @return TRUE if the model exists, FALSE if not
+#' @return TRUE if model is available on the server, FALSE otherwise
+#' @examples
+#' handshake("accept")
 #' @export
 handshake <- function(model_name, server=default_server())
 {
   address <- make_url(model_name, base_url = server, type = "info")
   res<-GET(address)
   message(res)
-  return(res$status_code)
+  found <- content(res)[[1]] == 100
+  if (found) {
+    message ("Model available for cloud access")
+    return (TRUE)
+
+  } else {
+    message ("Model not found on the server")
+    return (FALSE)
+    }
 }
 
 
