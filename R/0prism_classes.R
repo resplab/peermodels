@@ -28,51 +28,6 @@ guess_prism_input_type<-function(p_inp)
 
 
 
-print <- function(x)
-{
-  UseMethod("print",x)
-}
-print.prism_input<-function(x)
-{
-  print.listof(x)
-}
-
-
-Ops<-function(e1,e2)
-{
-  UseMethod("Ops",x)
-}
-Ops.prism_input<-function(e1,e2)
-{
-  source<-NULL;
-  dest<-NULL;
-  if(sum(class(e1)=="prism_input")>0) {source<-e1; e1<-e1$value}
-  if(sum(class(e2)=="prism_input")>0) {dest<-e2; e2<-e2$value}
-  val<-NextMethod(.Generic)
-  if(is.null(source)) return(val) else {source$value<-val; return(source)}
-}
-
-
-Math<-function(x,...)
-{
-  UseMethod("Math",x,...)
-}
-Math.prism_input<-function(x,...)
-{
-  source<-NULL;
-  dest<-NULL;
-  if(sum(class(x)=="prism_input")>0) {source<-x; x<-x$value}
-  val<-NextMethod(.Generic)
-  if(is.null(source)) return(val) else {source$value<-val; return(source)}
-}
-
-
-Summary<-function(...,na.rm)
-{
-  UseMethod("Summary",...,na.rm)
-}
-
-
 canbe_prism_input<-function(...)
 {
   y<-prism_input(0)

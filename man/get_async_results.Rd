@@ -19,8 +19,6 @@ get_async_results(
 \item{api_key}{API key}
 
 \item{server}{Server address. Defaults to PMN.}
-
-\item{bypass_router}{bypass server API router, for debugging purposes}
 }
 \value{
 processed (from JSON to R object result of the call)
