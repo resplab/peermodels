@@ -2,7 +2,7 @@
 [![R build status](https://github.com/resplab/prism/workflows/R-CMD-check/badge.svg)](https://github.com/resplab/prism/actions)
 <!-- badges: end -->
 [![CRAN status](https://www.r-pkg.org/badges/version/peermodels)](https://CRAN.R-project.org/package=peermodels)
-[![Project Status: Active  – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/Active .svg)](https://www.repostatus.org/#Active)
+[![Project Status: Active  – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/Active.svg)](https://www.repostatus.org/#Active)
 
 
 # peermodels
