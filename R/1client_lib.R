@@ -70,7 +70,7 @@ get_session <- function()
 }
 
 
-#' resets session info.
+#' resets session info and clears stored environmental variables such as API keys and server address.
 #'
 #' @export
 reset_session <- function()

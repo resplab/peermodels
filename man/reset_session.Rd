@@ -2,10 +2,10 @@
 % Please edit documentation in R/1client_lib.R
 \name{reset_session}
 \alias{reset_session}
-\title{resets session info.}
+\title{resets session info and clears stored environmental variables such as API keys and server address.}
 \usage{
 reset_session()
 }
 \description{
-resets session info.
+resets session info and clears stored environmental variables such as API keys and server address.
 }
