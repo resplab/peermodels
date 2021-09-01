@@ -11,7 +11,7 @@ get_default_input(model_name = NULL, api_key = NULL, server = NULL)
 
 \item{api_key}{API key. If null, it will be set to the last call's value.}
 
-\item{server}{Server name. If null, it will be set to the last call's value}
+\item{server}{Server address. If null, it will be set to Peer Models Network PRISM server on the first run and to the last call's value on subsequent runs.}
 }
 \description{
 Returns default PRISM model input

@@ -103,7 +103,7 @@ handshake <- function(model_name, server=default_server())
 #'
 #' @param model_name name of the model. If null, it will be set to the last call's value.
 #' @param api_key API key. If null, it will be set to the last call's value.
-#' @param server Server name. If null, it will be set to the last call's value
+#' @param server Server address. If null, it will be set to Peer Models Network PRISM server on the first run and to the last call's value on subsequent runs.
 #' @export
 get_default_input<-function(model_name=NULL, api_key=NULL, server=NULL)
 {
