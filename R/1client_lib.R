@@ -263,18 +263,24 @@ validate_email <- function(email_address){
 #' model_run ("epic", model_input = sample_input)
 #' }
 #' @export
-model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = NULL, async=FALSE, email_address=NULL)
+model_run<-function(model_name=NULL, model_input=NULL, api_key=NULL, server=NULL, async=FALSE, email_address=NULL)
 {
   if(is.null(model_name)) model_name <- this_session$model_name
   if(is.null(api_key)) api_key <- this_session$api_key
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- default_server()
 
-  if(async && !validate_email(email_address)) {stop("You must provide a valid email address for asynchronous calls.")}
+  if(async) {
+    if (!(validate_email(email_address))) {stop("You must provide a valid email address for asynchronous calls.")}
+  }
 
   address <- make_url(model_name, server, "call", async = async)
 
-  res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key, email_address=email_address)
+  if (async) {
+    res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key, email_address=email_address)
+  } else {
+    res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key)
+  }
 
   this_session$output_location<-this_session$last_location
   this_session$api_key<-api_key

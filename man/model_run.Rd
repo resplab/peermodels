@@ -9,7 +9,8 @@ model_run(
   model_input = NULL,
   api_key = NULL,
   server = NULL,
-  async = FALSE
+  async = FALSE,
+  email_address = NULL
 )
 }
 \arguments{

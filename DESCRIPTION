@@ -13,4 +13,4 @@ Imports:
     jsonlite,
     httr,
     stringr
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
