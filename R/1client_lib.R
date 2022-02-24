@@ -96,6 +96,7 @@ handshake <- function(model_name, server=default_server())
   }
   address <- make_url(model_name, base_url = server, type = "info")
   res <- request(address) %>%
+    req_error(is_error = function(resp) FALSE) %>%
     req_throttle(10/60) %>%
     req_perform()
   #res<-GET(address)
@@ -305,7 +306,7 @@ model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = 
 #' @export
 prism_call<-function(func, base_url, api_key = NULL, ...)
 {
-  if (!curl::has_internet()) {
+  if (!has_internet()) {
     message("No internet connection.")
     return(invisible(NULL))
   }
@@ -318,6 +319,7 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
   res <- request(base_url) %>%
     req_headers("x-prism-auth-user"=api_key) %>%
     req_body_json(arg) %>%
+    req_error(is_error = function(resp) FALSE) %>%
     req_throttle(10/60) %>%
     req_perform()
 
@@ -344,7 +346,7 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
 #This is an internal function that is always run after model_run etc so OK for it to rely on this_session for info
 get_output_object_list<-function(location=this_session$output_location)
 {
-  if (!curl::has_internet()) {
+  if (!has_internet()) {
     message("No internet connection.")
     return(invisible(NULL))
   }
@@ -354,6 +356,7 @@ get_output_object_list<-function(location=this_session$output_location)
 
   response <- request(url) %>%
     req_headers("x-prism-auth-user"=this_session$api_key) %>%
+    req_error(is_error = function(resp) FALSE) %>%
     req_throttle(10/60) %>%
     req_perform()
 
@@ -379,7 +382,7 @@ filter_output_object_list<-function(object_list,type="")
 
 get_output_object<-function(location=this_session$output_location,object)
 {
-  if (!curl::has_internet()) {
+  if (!has_internet()) {
     message("No internet connection.")
     return(invisible(NULL))
   }
@@ -388,6 +391,7 @@ get_output_object<-function(location=this_session$output_location,object)
 
   res <- request(url) %>%
     req_headers("x-prism-auth-user"=this_session$api_key) %>%
+    req_error(is_error = function(resp) FALSE) %>%
     req_throttle(10/60) %>%
     req_perform() %>%
     resp_body_json()
