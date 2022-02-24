@@ -90,6 +90,10 @@ reset_session <- function()
 #' @export
 handshake <- function(model_name, server=default_server())
 {
+  if (!has_internet()) {
+    message("No internet connection.")
+    return(invisible(NULL))
+  }
   address <- make_url(model_name, base_url = server, type = "info")
   res <- request(address) %>%
     req_throttle(10/60) %>%
@@ -301,9 +305,12 @@ model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = 
 #' @export
 prism_call<-function(func, base_url, api_key = NULL, ...)
 {
+  if (!curl::has_internet()) {
+    message("No internet connection.")
+    return(invisible(NULL))
+  }
   if(is.null(api_key)) api_key <- this_session$api_key
   if (is.null(api_key)) stop ("No API key provided.")
-
 
   message(paste0("Calling server at ", base_url))
   arg <- list(func=func,param=...)
@@ -337,6 +344,10 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
 #This is an internal function that is always run after model_run etc so OK for it to rely on this_session for info
 get_output_object_list<-function(location=this_session$output_location)
 {
+  if (!curl::has_internet()) {
+    message("No internet connection.")
+    return(invisible(NULL))
+  }
   url <- paste0(make_url(this_session$model_name, this_session$server, type="tmp"),"/",location)
   message(paste0("Calling server at ", url))
 
@@ -368,6 +379,10 @@ filter_output_object_list<-function(object_list,type="")
 
 get_output_object<-function(location=this_session$output_location,object)
 {
+  if (!curl::has_internet()) {
+    message("No internet connection.")
+    return(invisible(NULL))
+  }
   url <- paste0(make_url(this_session$model_name,this_session$server,"tmp"),"/", location,"/",object)
   #message(paste("call is ",call))
 
