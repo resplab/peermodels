@@ -7,7 +7,9 @@ on_load<-function()
   options(stringsAsFactors = FALSE)
 }
 
-
+is_response <- function(x) {
+  class(x) == "httr2_response"
+}
 
 #' Returns the default server path for PRISM server
 #'
@@ -95,12 +97,21 @@ handshake <- function(model_name, server=default_server())
     return(invisible(NULL))
   }
   address <- make_url(model_name, base_url = server, type = "info")
-  res <- request(address) %>%
+
+  #fails gracefully to comply with CRAN policy
+  res <- tryCatch(
+    request(address) %>%
     req_error(is_error = function(resp) FALSE) %>%
-    req_throttle(10/60) %>%
-    req_perform()
-  #res<-GET(address)
-  print(res)
+    #req_throttle(10/60) %>%
+    req_perform(),
+    error = function(e) conditionMessage(e),
+    warning = function(w) conditionMessage(w))
+
+  # graceful fail for timeout errors
+  if (!is_response(res)) {
+         message(res)
+         return(invisible(NULL))}
+
   found <- (res %>% resp_body_json())[1] == 100
   if (found) {
     return ("Model available for cloud access")
@@ -323,13 +334,7 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
     req_throttle(10/60) %>%
     req_perform()
 
-
-  # res  <- NULL
-  # res   <- POST(call, add_headers('x-prism-auth-user'=api_key), body=toJSON(arg), content_type_json())
-
- # this_session$last_location <- res$headers$'x-ocpu-session'
   if(!is.null(api_key)) this_session$api_key <- api_key
-  #res <- content(res)[[1]]
   resObject <-(res %>% resp_body_json())[[1]]
   if (!validate(as.character(resObject))) {stop("Non-standard response received from server.")} #handling error messages
   if (is.numeric(resObject)) { # error number is received from server
@@ -360,9 +365,9 @@ get_output_object_list<-function(location=this_session$output_location)
     req_throttle(10/60) %>%
     req_perform()
 
-  #response <- GET(url, add_headers('x-prism-auth-user'=this_session$api_key))
-
-  if(response$status_code!=200 && response$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(response$content, 16L))))
+  if (response$status_code!=200 && response$status_code!=201) { #TODO check if necessary
+     message(paste("Error:"),rawToChar(as.raw(strtoi(response$content, 16L))))
+     return(invisible(NULL))}
 
   str<-content(response)
   con<-textConnection(str)
@@ -396,7 +401,6 @@ get_output_object<-function(location=this_session$output_location,object)
     req_perform() %>%
     resp_body_json()
 
-  #res<-content(GET(url, add_headers('x-prism-auth-user'=this_session$api_key)))
   return(res)
 }
 
