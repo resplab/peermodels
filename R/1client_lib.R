@@ -92,7 +92,7 @@ handshake <- function(model_name, server=default_server())
 {
   address <- make_url(model_name, base_url = server, type = "info")
   res <- request(address) %>%
-    req_throttle(1/60) %>%
+    req_throttle(10/60) %>%
     req_perform()
   #res<-GET(address)
   print(res)
@@ -301,6 +301,8 @@ model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = 
 prism_call<-function(func, base_url, api_key = NULL, ...)
 {
   if(is.null(api_key)) api_key <- this_session$api_key
+  if (is.null(api_key)) stop ("No API key provided.")
+
 
   message(paste0("Calling server at ", base_url))
   arg <- list(func=func,param=...)
@@ -308,7 +310,7 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
   res <- request(base_url) %>%
     req_headers("x-prism-auth-user"=api_key) %>%
     req_body_json(arg) %>%
-    req_throttle(1/60) %>%
+    req_throttle(10/60) %>%
     req_perform()
 
 
@@ -317,14 +319,13 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
 
  # this_session$last_location <- res$headers$'x-ocpu-session'
   if(!is.null(api_key)) this_session$api_key <- api_key
-  if (is.null(this_session$api_key)) stop ("No API key provided.")
   #res <- content(res)[[1]]
-  res <-(res %>% resp_body_json())[1]
-  if (!validate(as.character(res))) {stop("Non-standard response received from server.")} #handling error messages
-  if (is.numeric(res)) { # error number is received from server
-    stop(res)
+  resObject <-(res %>% resp_body_json())[[1]]
+  if (!validate(as.character(resObject))) {stop("Non-standard response received from server.")} #handling error messages
+  if (is.numeric(resObject)) { # error number is received from server
+    stop((res %>% resp_body_json())$description)
   } else { #standard JSON is received
-    res<-fromJSON(as.character(res))
+    res<-fromJSON(as.character(resObject))
 }
 
   return(res)
@@ -341,7 +342,7 @@ get_output_object_list<-function(location=this_session$output_location)
 
   response <- request(url) %>%
     req_headers("x-prism-auth-user"=this_session$api_key) %>%
-    req_throttle(1/60) %>%
+    req_throttle(10/60) %>%
     req_perform()
 
   #response <- GET(url, add_headers('x-prism-auth-user'=this_session$api_key))
@@ -371,7 +372,7 @@ get_output_object<-function(location=this_session$output_location,object)
 
   res <- request(url) %>%
     req_headers("x-prism-auth-user"=this_session$api_key) %>%
-    req_throttle(1/60) %>%
+    req_throttle(10/60) %>%
     req_perform() %>%
     resp_body_json()
 
