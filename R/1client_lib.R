@@ -256,6 +256,7 @@ validate_email <- function(email_address){
 #' @param api_key API key
 #' @param server server address. Defaults to the Peer Models Network PRSIM repository.
 #' @param async should the model be called in async mode?
+#' @param email_address async results will be emailed to this address
 #' @return 0 for success and 1 for error
 #' @examples
 #' \dontrun{

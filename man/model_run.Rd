@@ -23,6 +23,8 @@ model_run(
 \item{server}{server address. Defaults to the Peer Models Network PRSIM repository.}
 
 \item{async}{should the model be called in async mode?}
+
+\item{email_address}{async results will be emailed to this address}
 }
 \value{
 0 for success and 1 for error
