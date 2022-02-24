@@ -91,16 +91,17 @@ reset_session <- function()
 handshake <- function(model_name, server=default_server())
 {
   address <- make_url(model_name, base_url = server, type = "info")
-  res<-GET(address)
-  message(res)
-  found <- content(res)[[1]] == 100
+  res <- request(address) %>%
+    req_throttle(1/60) %>%
+    req_perform()
+  #res<-GET(address)
+  print(res)
+  found <- (res %>% resp_body_json())[1] == 100
   if (found) {
-    message ("Model available for cloud access")
-    return (TRUE)
+    return ("Model available for cloud access")
 
   } else {
-    message ("Model not found on the server")
-    return (FALSE)
+    return ("Model not found on the server")
     }
 }
 
@@ -299,33 +300,31 @@ model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = 
 #' @export
 prism_call<-function(func, base_url, api_key = NULL, ...)
 {
-  call <- base_url
-
   if(is.null(api_key)) api_key <- this_session$api_key
 
-  message(paste0("Calling server at ", call))
-
+  message(paste0("Calling server at ", base_url))
   arg <- list(func=func,param=...)
-  request   <- NULL
-  request   <- POST(call, add_headers('x-prism-auth-user'=api_key), body=toJSON(arg), content_type_json())
 
-  if(request$status_code!=200 && request$status_code!=201)
-  {
-    message(paste("Error:"),rawToChar(as.raw(strtoi(request$content, 16L))))
-    this_session$last_call_status <- request$last_status_code
-    return(NULL)
-  }
+  res <- request(base_url) %>%
+    req_headers("x-prism-auth-user"=api_key) %>%
+    req_body_json(arg) %>%
+    req_throttle(1/60) %>%
+    req_perform()
 
-  this_session$last_location <- request$headers$'x-ocpu-session'
+
+  # res  <- NULL
+  # res   <- POST(call, add_headers('x-prism-auth-user'=api_key), body=toJSON(arg), content_type_json())
+
+ # this_session$last_location <- res$headers$'x-ocpu-session'
   if(!is.null(api_key)) this_session$api_key <- api_key
-
-  res <- content(request)[[1]]
-
+  if (is.null(this_session$api_key)) stop ("No API key provided.")
+  #res <- content(res)[[1]]
+  res <-(res %>% resp_body_json())[1]
   if (!validate(as.character(res))) {stop("Non-standard response received from server.")} #handling error messages
   if (is.numeric(res)) { # error number is received from server
     stop(res)
   } else { #standard JSON is received
-    res<-fromJSON(res)
+    res<-fromJSON(as.character(res))
 }
 
   return(res)
@@ -339,8 +338,13 @@ get_output_object_list<-function(location=this_session$output_location)
   url <- paste0(make_url(this_session$model_name, this_session$server, type="tmp"),"/",location)
   message(paste0("Calling server at ", url))
 
-  response <- NULL
-  response <- GET(url, add_headers('x-prism-auth-user'=this_session$api_key))
+
+  response <- request(url) %>%
+    req_headers("x-prism-auth-user"=this_session$api_key) %>%
+    req_throttle(1/60) %>%
+    req_perform()
+
+  #response <- GET(url, add_headers('x-prism-auth-user'=this_session$api_key))
 
   if(response$status_code!=200 && response$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(response$content, 16L))))
 
@@ -365,8 +369,13 @@ get_output_object<-function(location=this_session$output_location,object)
   url <- paste0(make_url(this_session$model_name,this_session$server,"tmp"),"/", location,"/",object)
   #message(paste("call is ",call))
 
-  res<-content(GET(url, add_headers('x-prism-auth-user'=this_session$api_key)))
+  res <- request(url) %>%
+    req_headers("x-prism-auth-user"=this_session$api_key) %>%
+    req_throttle(1/60) %>%
+    req_perform() %>%
+    resp_body_json()
 
+  #res<-content(GET(url, add_headers('x-prism-auth-user'=this_session$api_key)))
   return(res)
 }
 
