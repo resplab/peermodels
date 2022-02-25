@@ -369,7 +369,9 @@ get_output_object_list<-function(location=this_session$output_location)
      message(paste("Error:"),rawToChar(as.raw(strtoi(response$content, 16L))))
      return(invisible(NULL))}
 
-  str<-content(response)
+  str<-response %>% resp_body_string()
+
+
   con<-textConnection(str)
   lines<-readLines(con)
   close(con)
