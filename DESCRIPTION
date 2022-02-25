@@ -11,6 +11,7 @@ LazyData: true
 URL: https://www.peermodelsnetwork.com
 Imports:
     jsonlite,
+    httr,
     curl,
     httr2,
     stringr

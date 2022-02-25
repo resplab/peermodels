@@ -139,8 +139,18 @@ handshake <- function(model_name, server=default_server())
 #' @export
 get_default_input<-function(model_name=NULL, api_key=NULL, server=NULL)
 {
-  if(is.null(model_name)) model_name <- this_session$model_name
-  if(is.null(api_key)) api_key <- this_session$api_key
+  if(is.null(model_name)) {
+    if (is.null(this_session$model_name)) stop("No model specified.")
+    model_name <- this_session$model_name
+    message(paste0("Calling last saved model: ", model_name))
+  }
+
+  if(is.null(api_key)) {
+    if (is.null(this_session$api_key)) stop("No API key provided or saved in the session.")
+    api_key <- this_session$api_key
+    message ("Using stored API key.")
+  }
+
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- default_server()
   this_session$server <- server
@@ -283,10 +293,24 @@ validate_email <- function(email_address){
 #' @export
 model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = NULL, async=FALSE, email_address=NULL)
 {
-  if(is.null(model_name)) model_name <- this_session$model_name
-  if(is.null(api_key)) api_key <- this_session$api_key
+  if(is.null(model_name)) {
+    if (is.null(this_session$model_name)) stop("No model specified.")
+    model_name <- this_session$model_name
+    message(paste0("Calling last saved model: ", model_name))
+    }
+
+  if(is.null(api_key)) {
+    if (is.null(this_session$api_key)) stop("No API key provided or saved in the session.")
+    api_key <- this_session$api_key
+    message("Using stored API key.")
+  }
+
+  if(is.null(model_input)) message("No explicit model_input provided, the model might produce an error or revert to its default set of inputs.")
+
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- default_server()
+
+
 
   if(async && !validate_email(email_address)) {stop("You must provide a valid email address for asynchronous calls.")}
 
@@ -356,6 +380,11 @@ get_output_object_list<-function(location=this_session$output_location)
     message("No internet connection.")
     return(invisible(NULL))
   }
+
+  if (is.null(this_session$model_name)) {
+    stop("No model specified. Run a model first with model_run before retrieving output objects.")
+
+  }
   url <- paste0(make_url(this_session$model_name, this_session$server, type="tmp"),"/",location)
   message(paste0("Calling server at ", url))
 
@@ -397,13 +426,15 @@ get_output_object<-function(location=this_session$output_location,object)
   url <- paste0(make_url(this_session$model_name,this_session$server,"tmp"),"/", location,"/",object)
   #message(paste("call is ",call))
 
-  res <- request(url) %>%
-    req_headers("x-prism-auth-user"=this_session$api_key) %>%
-    req_error(is_error = function(resp) FALSE) %>%
-    req_throttle(10/60) %>%
-    req_perform() %>%
-    resp_body_json()
+  # res <- request(url) %>%
+  #   req_headers("x-prism-auth-user"=this_session$api_key) %>%
+  #   req_error(is_error = function(resp) FALSE) %>%
+  #   req_throttle(10/60) %>%
+  #   req_perform() %>%
+  #   resp_body_string()
 
+
+  res<-content(GET(url, add_headers('x-prism-auth-user'=this_session$api_key)))
   return(res)
 }
 
