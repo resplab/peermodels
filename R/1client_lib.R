@@ -334,6 +334,7 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
     req_throttle(10/60) %>%
     req_perform()
 
+  this_session$last_location <- res$headers$'x-ocpu-session'
   if(!is.null(api_key)) this_session$api_key <- api_key
   resObject <-(res %>% resp_body_json())[[1]]
   if (!validate(as.character(resObject))) {stop("Non-standard response received from server.")} #handling error messages
