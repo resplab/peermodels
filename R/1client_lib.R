@@ -316,7 +316,14 @@ model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = 
 
   address <- make_url(model_name, server, "call", async = async)
 
-  res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key, email_address=email_address)
+  if(is.null(email_address))
+  {
+    res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key)
+  }
+  else
+  {
+    res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key, email_address=email_address)
+  }
 
   this_session$output_location<-this_session$last_location
   this_session$api_key<-api_key
