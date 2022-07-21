@@ -1,6 +1,6 @@
 Package: peermodels
 Title: Client-Side R API Wrapper for Peer Models Network Model Repository 
-Version: 0.10.3
+Version: 0.10.4
 Authors@R: c(person("amin", "adibi", email = "adibi@alumni.ubc.ca", role = c("aut", "cre")),
              person("Mohsen", "Sadatsafavi", email = "mohsen.sadatsafavi@ubc.ca", role = c("aut", "cph")))
 Description: Enables direct cloud access to health care decision models hosted on the PRISM server of the Peer Models Network.
