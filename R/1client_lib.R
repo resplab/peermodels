@@ -8,7 +8,6 @@ on_load<-function()
 }
 
 
-
 #' Returns the default server path for PRISM server
 #'
 #' @return the default server path for PRISM server
@@ -112,7 +111,7 @@ handshake <- function(model_name, server=default_server())
 #' Returns default PRISM model input
 #'
 #' @param model_name name of the model. If null, it will be set to the last call's value.
-#' @param api_key API key. If null, it will be set to the last call's value.
+#' @param api_key API key. If null, it will be set to the one saved in the environment.
 #' @param server Server address. If null, it will be set to Peer Models Network PRISM server on the first run and to the last call's value on subsequent runs.
 #' @return default model inputs, which can be changed and submitted to the model for a different run.
 #' @examples
@@ -123,7 +122,7 @@ handshake <- function(model_name, server=default_server())
 get_default_input<-function(model_name=NULL, api_key=NULL, server=NULL)
 {
   if(is.null(model_name)) model_name <- this_session$model_name
-  if(is.null(api_key)) api_key <- this_session$api_key
+  if(is.null(api_key)) api_key <- Sys.getenv('PMN_API_KEY')
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- default_server()
   this_session$server <- server
@@ -132,14 +131,11 @@ get_default_input<-function(model_name=NULL, api_key=NULL, server=NULL)
   default_inputs   <- prism_call(func="prism_get_default_input", base_url = url, api_key = api_key)
 
   this_session$model_name <- model_name
-  this_session$api_key <- api_key
+  Sys.setenv(PMN_API_KEY=api_key)
   this_session$server <- server
 
   return(default_inputs)
 }
-
-
-
 
 
 
@@ -188,12 +184,6 @@ unprocess_input<-function(inp)
   }
   return(out)
 }
-
-
-
-
-
-
 
 
 
@@ -266,7 +256,7 @@ validate_email <- function(email_address){
 model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = NULL, async=FALSE, email_address=NULL)
 {
   if(is.null(model_name)) model_name <- this_session$model_name
-  if(is.null(api_key)) api_key <- this_session$api_key
+  if(is.null(api_key)) api_key <-  Sys.getenv('PMN_API_KEY')
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- default_server()
 
@@ -274,10 +264,12 @@ model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = 
 
   address <- make_url(model_name, server, "call", async = async)
 
-  res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key, email_address=email_address)
+  if (async) {
+    res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key, email_address=email_address)}
+  else {res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key)}
 
-  this_session$output_location<-this_session$last_location
-  this_session$api_key<-api_key
+  this_session$output_location <- this_session$last_location
+  Sys.setenv(PMN_API_KEY=api_key)
   this_session$server <- server
   this_session$current_model <- model_name
   this_session$output_list <- NULL #This item needs to be retrieved explicitly by a separate call so we nullify it here
@@ -301,7 +293,9 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
 {
   call <- base_url
 
-  if(is.null(api_key)) api_key <- this_session$api_key
+  if(is.null(api_key)) api_key <- Sys.getenv('PMN_API_KEY')
+
+  if(api_key=="") stop("No API key found.")
 
   message(paste0("Calling server at ", call))
 
@@ -317,7 +311,7 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
   }
 
   this_session$last_location <- request$headers$'x-ocpu-session'
-  if(!is.null(api_key)) this_session$api_key <- api_key
+  if(!is.null(api_key)) Sys.setenv('PMN_API_KEY'= api_key)
 
   res <- content(request)[[1]]
 
@@ -340,7 +334,7 @@ get_output_object_list<-function(location=this_session$output_location)
   message(paste0("Calling server at ", url))
 
   response <- NULL
-  response <- GET(url, add_headers('x-prism-auth-user'=this_session$api_key))
+  response <- GET(url, add_headers('x-prism-auth-user'=Sys.getenv('PMN_API_KEY')))
 
   if(response$status_code!=200 && response$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(response$content, 16L))))
 
@@ -365,7 +359,7 @@ get_output_object<-function(location=this_session$output_location,object)
   url <- paste0(make_url(this_session$model_name,this_session$server,"tmp"),"/", location,"/",object)
   #message(paste("call is ",call))
 
-  res<-content(GET(url, add_headers('x-prism-auth-user'=this_session$api_key)))
+  res<-content(GET(url, add_headers('x-prism-auth-user'=Sys.getenv('PMN_API_KEY'))))
 
   return(res)
 }
@@ -384,7 +378,7 @@ get_async_results <- function(model_name = NULL, token = NULL, api_key = NULL, s
 
   if(is.null(token)) stop("Async job token not provided")
   if(is.null(model_name)) model_name <- this_session$model_name
-  if(is.null(api_key)) api_key <- this_session$api_key
+  if(is.null(api_key)) api_key <-  Sys.getenv('PMN_API_KEY')
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- default_server()
 
