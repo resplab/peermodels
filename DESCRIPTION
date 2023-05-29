@@ -12,5 +12,8 @@ URL: https://www.peermodelsnetwork.com
 Imports:
     jsonlite,
     httr,
+    curl,
+    httr2,
     stringr
 RoxygenNote: 7.2.3
+

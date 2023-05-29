@@ -7,6 +7,9 @@ on_load<-function()
   options(stringsAsFactors = FALSE)
 }
 
+is_response <- function(x) {
+  class(x) == "httr2_response"
+}
 
 #' Returns the default server path for PRISM server
 #'
@@ -89,18 +92,33 @@ reset_session <- function()
 #' @export
 handshake <- function(model_name, server=default_server())
 {
+  if (!has_internet()) {
+    message("No internet connection.")
+    return(invisible(NULL))
+  }
   address <- make_url(model_name, base_url = server, type = "info")
-  res<-GET(address)
-  message(res)
-  found <- content(res)[[1]] == 100
+
+  #fails gracefully to comply with CRAN policy
+  res <- tryCatch(
+    request(address) %>%
+      req_error(is_error = function(resp) FALSE) %>%
+      #req_throttle(10/60) %>%
+      req_perform(),
+    error = function(e) conditionMessage(e),
+    warning = function(w) conditionMessage(w))
+
+  # graceful fail for timeout errors
+  if (!is_response(res)) {
+    message(res)
+    return(invisible(NULL))}
+
+  found <- (res %>% resp_body_json())[1] == 100
   if (found) {
-    message ("Model available for cloud access")
-    return (TRUE)
+    return ("Model available for cloud access")
 
   } else {
-    message ("Model not found on the server")
-    return (FALSE)
-    }
+    return ("Model not found on the server")
+  }
 }
 
 
@@ -111,7 +129,7 @@ handshake <- function(model_name, server=default_server())
 #' Returns default PRISM model input
 #'
 #' @param model_name name of the model. If null, it will be set to the last call's value.
-#' @param api_key API key. If null, it will be set to the one saved in the environment.
+#' @param api_key API key. If null, it will be set to the last call's value.
 #' @param server Server address. If null, it will be set to Peer Models Network PRISM server on the first run and to the last call's value on subsequent runs.
 #' @return default model inputs, which can be changed and submitted to the model for a different run.
 #' @examples
@@ -121,8 +139,18 @@ handshake <- function(model_name, server=default_server())
 #' @export
 get_default_input<-function(model_name=NULL, api_key=NULL, server=NULL)
 {
-  if(is.null(model_name)) model_name <- this_session$model_name
-  if(is.null(api_key)) api_key <- Sys.getenv('PMN_API_KEY')
+  if(is.null(model_name)) {
+    if (is.null(this_session$model_name)) stop("No model specified.")
+    model_name <- this_session$model_name
+    message(paste0("Calling last saved model: ", model_name))
+  }
+
+  if(is.null(api_key)) {
+    if (Sys.getenv('PMN_API_KEY')=="") stop("No API key provided or saved in the session.")
+    api_key <- Sys.getenv('PMN_API_KEY')
+    message ("Using stored API key.")
+  }
+
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- default_server()
   this_session$server <- server
@@ -136,6 +164,9 @@ get_default_input<-function(model_name=NULL, api_key=NULL, server=NULL)
 
   return(default_inputs)
 }
+
+
+
 
 
 
@@ -184,6 +215,12 @@ unprocess_input<-function(inp)
   }
   return(out)
 }
+
+
+
+
+
+
 
 
 
@@ -245,6 +282,7 @@ validate_email <- function(email_address){
 #' @param api_key API key
 #' @param server server address. Defaults to the Peer Models Network PRSIM repository.
 #' @param async should the model be called in async mode?
+#' @param email_address async results will be emailed to this address
 #' @return 0 for success and 1 for error
 #' @examples
 #' \dontrun{
@@ -255,20 +293,39 @@ validate_email <- function(email_address){
 #' @export
 model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = NULL, async=FALSE, email_address=NULL)
 {
-  if(is.null(model_name)) model_name <- this_session$model_name
-  if(is.null(api_key)) api_key <-  Sys.getenv('PMN_API_KEY')
+  if(is.null(model_name)) {
+    if (is.null(this_session$model_name)) stop("No model specified.")
+    model_name <- this_session$model_name
+    message(paste0("Calling last saved model: ", model_name))
+  }
+
+  if(is.null(api_key)) {
+    if (Sys.getenv('PMN_API_KEY')=="") stop("No API key provided or saved in the session.")
+    api_key <- Sys.getenv('PMN_API_KEY')
+    message("Using stored API key.")
+  }
+
+  if(is.null(model_input)) message("No explicit model_input provided, the model might produce an error or revert to its default set of inputs.")
+
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- default_server()
+
+
 
   if(async && !validate_email(email_address)) {stop("You must provide a valid email address for asynchronous calls.")}
 
   address <- make_url(model_name, server, "call", async = async)
 
-  if (async) {
-    res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key, email_address=email_address)}
-  else {res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key)}
+  if(is.null(email_address))
+  {
+    res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key)
+  }
+  else
+  {
+    res<-prism_call("prism_model_run",  base_url = address, model_input=model_input, api_key = api_key, email_address=email_address)
+  }
 
-  this_session$output_location <- this_session$last_location
+  this_session$output_location<-this_session$last_location
   Sys.setenv(PMN_API_KEY=api_key)
   this_session$server <- server
   this_session$current_model <- model_name
@@ -291,36 +348,32 @@ model_run<-function(model_name=NULL, model_input=NULL, api_key = NULL, server = 
 #' @export
 prism_call<-function(func, base_url, api_key = NULL, ...)
 {
-  call <- base_url
-
-  if(is.null(api_key)) api_key <- Sys.getenv('PMN_API_KEY')
-
-  if(api_key=="") stop("No API key found.")
-
-  message(paste0("Calling server at ", call))
-
-  arg <- list(func=func,param=...)
-  request   <- NULL
-  request   <- POST(call, add_headers('x-prism-auth-user'=api_key), body=toJSON(arg), content_type_json())
-
-  if(request$status_code!=200 && request$status_code!=201)
-  {
-    message(paste("Error:"),rawToChar(as.raw(strtoi(request$content, 16L))))
-    this_session$last_call_status <- request$last_status_code
-    return(NULL)
+  if (!has_internet()) {
+    message("No internet connection.")
+    return(invisible(NULL))
   }
+  if(is.null(api_key)) api_key <- Sys.getenv('PMN_API_KEY')
+  if (api_key=="") stop ("No API key provided.")
 
-  this_session$last_location <- request$headers$'x-ocpu-session'
-  if(!is.null(api_key)) Sys.setenv('PMN_API_KEY'= api_key)
+  message(paste0("Calling server at ", base_url))
+  arg <- list(func=func,param=...)
 
-  res <- content(request)[[1]]
+  res <- request(base_url) %>%
+    req_headers("x-prism-auth-user"=api_key) %>%
+    req_body_json(arg) %>%
+    req_error(is_error = function(resp) FALSE) %>%
+    req_throttle(10/60) %>%
+    req_perform()
 
-  if (!validate(as.character(res))) {stop("Non-standard response received from server.")} #handling error messages
-  if (is.numeric(res)) { # error number is received from server
-    stop(res)
+  this_session$last_location <- res$headers$'x-ocpu-session'
+  if(!is.null(api_key)) Sys.setenv(PMN_API_KEY=api_key)
+  resObject <-(res %>% resp_body_json())[[1]]
+  if (!validate(as.character(resObject))) {stop("Non-standard response received from server.")} #handling error messages
+  if (is.numeric(resObject)) { # error number is received from server
+    stop((res %>% resp_body_json())$description)
   } else { #standard JSON is received
-    res<-fromJSON(res)
-}
+    res<-fromJSON(as.character(resObject))
+  }
 
   return(res)
 }
@@ -330,15 +383,32 @@ prism_call<-function(func, base_url, api_key = NULL, ...)
 #This is an internal function that is always run after model_run etc so OK for it to rely on this_session for info
 get_output_object_list<-function(location=this_session$output_location)
 {
+  if (!has_internet()) {
+    message("No internet connection.")
+    return(invisible(NULL))
+  }
+
+  if (is.null(this_session$model_name)) {
+    stop("No model specified. Run a model first with model_run before retrieving output objects.")
+
+  }
   url <- paste0(make_url(this_session$model_name, this_session$server, type="tmp"),"/",location)
   message(paste0("Calling server at ", url))
 
-  response <- NULL
-  response <- GET(url, add_headers('x-prism-auth-user'=Sys.getenv('PMN_API_KEY')))
 
-  if(response$status_code!=200 && response$status_code!=201) stop(paste("Error:"),rawToChar(as.raw(strtoi(response$content, 16L))))
+  response <- request(url) %>%
+    req_headers("x-prism-auth-user"=Sys.getenv("PMN_API_KEY")) %>%
+    req_error(is_error = function(resp) FALSE) %>%
+    req_throttle(10/60) %>%
+    req_perform()
 
-  str<-content(response)
+  if (response$status_code!=200 && response$status_code!=201) { #TODO check if necessary
+    message(paste("Error:"),rawToChar(as.raw(strtoi(response$content, 16L))))
+    return(invisible(NULL))}
+
+  str<-response %>% resp_body_string()
+
+
   con<-textConnection(str)
   lines<-readLines(con)
   close(con)
@@ -356,11 +426,22 @@ filter_output_object_list<-function(object_list,type="")
 
 get_output_object<-function(location=this_session$output_location,object)
 {
+  if (!has_internet()) {
+    message("No internet connection.")
+    return(invisible(NULL))
+  }
   url <- paste0(make_url(this_session$model_name,this_session$server,"tmp"),"/", location,"/",object)
   #message(paste("call is ",call))
 
-  res<-content(GET(url, add_headers('x-prism-auth-user'=Sys.getenv('PMN_API_KEY'))))
+  # res <- request(url) %>%
+  #   req_headers("x-prism-auth-user"=this_session$api_key) %>%
+  #   req_error(is_error = function(resp) FALSE) %>%
+  #   req_throttle(10/60) %>%
+  #   req_perform() %>%
+  #   resp_body_string()
 
+
+  res<-content(GET(url, add_headers('x-prism-auth-user'=Sys.getenv("PMN_API_KEY"))))
   return(res)
 }
 
@@ -378,7 +459,7 @@ get_async_results <- function(model_name = NULL, token = NULL, api_key = NULL, s
 
   if(is.null(token)) stop("Async job token not provided")
   if(is.null(model_name)) model_name <- this_session$model_name
-  if(is.null(api_key)) api_key <-  Sys.getenv('PMN_API_KEY')
+  if(is.null(api_key)) api_key <- Sys.getenv("PMN_API_KEY")
   if(is.null(server)) server <- this_session$server
   if(is.null(server)) server <- default_server()
 
